@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cape Town Tour Guide — Scroll-Driven Sequence</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+
+  <!-- Full-Screen Progressive Loading Overlay -->
+  <aside id="loader-overlay" class="loader-overlay" aria-live="polite">
+    <div class="loader-panel">
+      <div class="loader-header">
+        <span class="loader-tag">INITIALIZING RUNTIME</span>
+        <span class="loader-status-code">SYS-OK</span>
+      </div>
+      <div class="loader-counter-wrap">
+        <span id="loader-percentage" class="loader-percentage">0%</span>
+      </div>
+      <div class="loader-bar-track">
+        <div id="loader-bar" class="loader-bar-fill"></div>
+      </div>
+      <div class="loader-meta">
+        <span id="loader-status-text" class="loader-meta-text">BUFFERING INITIAL ASSETS (0 / 40)</span>
+        <span class="loader-meta-sub">FRAME_STEP: 2 // COVER SCALING ACTIVE</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Fixed Top Scroll Progress Bar -->
+  <div class="scroll-progress-line" role="progressbar" aria-label="Tour scroll progress">
+    <div id="scroll-progress-bar" class="scroll-progress-fill"></div>
+  </div>
+
+  <!-- Main Scroll Container (12000px virtual track for GSAP ScrollTrigger) -->
+  <main id="scroll-track" class="scroll-track">
+    <!-- Pinned Viewport (100vw x 100vh) -->
+    <div id="pinned-viewport" class="pinned-viewport">
+      <canvas id="sequence-canvas" class="sequence-canvas"></canvas>
+
+
+      <!-- Lower-Left Overlays Container (Title Only For In-Frame Area) -->
+      <section class="overlay-container" aria-label="Cape Town Tour Current Area">
+
+        <!-- Stop 1 -->
+        <article class="stop-card" data-stop-index="0" id="stop-0">
+          <h2 class="stop-title">Bo-Kaap</h2>
+        </article>
+
+        <!-- Stop 2 -->
+        <article class="stop-card" data-stop-index="1" id="stop-1">
+          <h2 class="stop-title">Lion's Head</h2>
+        </article>
+
+        <!-- Stop 3 -->
+        <article class="stop-card" data-stop-index="2" id="stop-2">
+          <h2 class="stop-title">Table Mountain</h2>
+        </article>
+
+        <!-- Stop 4 -->
+        <article class="stop-card" data-stop-index="3" id="stop-3">
+          <h2 class="stop-title">Boulders Beach</h2>
+        </article>
+
+        <!-- Stop 5 -->
+        <article class="stop-card" data-stop-index="4" id="stop-4">
+          <h2 class="stop-title">Cape of Good Hope</h2>
+        </article>
+
+        <!-- Stop 6 -->
+        <article class="stop-card" data-stop-index="5" id="stop-5">
+          <h2 class="stop-title">Cape Point Nature Reserve</h2>
+        </article>
+
+        <!-- Stop 7 -->
+        <article class="stop-card" data-stop-index="6" id="stop-6">
+          <h2 class="stop-title">Kirstenbosch Gardens</h2>
+        </article>
+
+        <!-- Stop 8 -->
+        <article class="stop-card" data-stop-index="7" id="stop-7">
+          <h2 class="stop-title">Groot Constantia</h2>
+        </article>
+
+        <!-- Stop 9 -->
+        <article class="stop-card" data-stop-index="8" id="stop-8">
+          <h2 class="stop-title">Franschhoek Winelands</h2>
+        </article>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Vite Vanilla Entry -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
