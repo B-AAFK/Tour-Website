@@ -13,7 +13,6 @@ A high-performance, scroll-driven web experience showcasing a 9-stop tour of Cap
    - Falls back gracefully to the nearest loaded frame if the user scrolls past frames still loading.
 
 2. **Progressive Preloading**
-   - Displays a full-screen loading panel with a live percentage counter (0% to 100%).
    - Unlocks the scroll sequence as soon as the initial 40 frames buffer (`INITIAL_LOAD_TARGET = 40`), while the remaining frames load in the background with a concurrency limit of 8.
 
 3. **Frame-Synced Location Captions**
@@ -29,16 +28,6 @@ A high-performance, scroll-driven web experience showcasing a 9-stop tour of Cap
      - **Franschhoek Winelands**: Frames 434 – 449
    - Features intentional dead zones between stops where captions fade out cleanly during aerial wipes and transition pans.
    - Includes a minimal 1px progress line fixed across the top of the viewport.
-
-4. **Design System & Architecture**
-   - Utilitarian Flat Design: solid dark surfaces, sharp 1px borders, system fonts, zero drop shadows, zero ambient gradients, zero blur, and zero emojis.
-   - Modular ES6 architecture:
-     - `src/config/tourConfig.js`: Tour stop bounds and sequence settings.
-     - `src/core/frameLoader.js`: Frame registry builder and progressive loader.
-     - `src/core/canvasRenderer.js`: DPR scaling and cover-fit rendering loop.
-     - `src/core/scrollController.js`: GSAP timeline and ScrollTrigger setup.
-     - `src/ui/overlayManager.js`: Location card and progress bar management.
-     - `src/styles/`: Layered CSS tokens, base reset, and component styles.
 
 ---
 
