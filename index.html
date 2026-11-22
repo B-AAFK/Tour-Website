@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cape Town Tour Guide — Scroll-Driven Sequence</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="/src/styles.css">
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/base.css">
+  <link rel="stylesheet" href="/src/styles/components.css">
 </head>
 <body>
 
@@ -40,52 +42,51 @@
     <div id="pinned-viewport" class="pinned-viewport">
       <canvas id="sequence-canvas" class="sequence-canvas"></canvas>
 
+      <!-- Lower-Left Overlays Container (Exact Frame-Based Trigger Points) -->
+      <section class="overlay-container" aria-label="Cape Town Tour Stops">
 
-      <!-- Lower-Left Overlays Container (Title Only For In-Frame Area) -->
-      <section class="overlay-container" aria-label="Cape Town Tour Current Area">
-
-        <!-- Stop 1 -->
-        <article class="stop-card" data-stop-index="0" id="stop-0">
+        <!-- Stop 1 (Frames 0 - 22) -->
+        <article class="stop-card" data-stop-id="1" id="stop-1">
           <h2 class="stop-title">Bo-Kaap</h2>
         </article>
 
-        <!-- Stop 2 -->
-        <article class="stop-card" data-stop-index="1" id="stop-1">
+        <!-- Stop 2 (Frames 34 - 71) -->
+        <article class="stop-card" data-stop-id="2" id="stop-2">
           <h2 class="stop-title">Lion's Head</h2>
         </article>
 
-        <!-- Stop 3 -->
-        <article class="stop-card" data-stop-index="2" id="stop-2">
+        <!-- Stop 3 (Frames 90 - 126) -->
+        <article class="stop-card" data-stop-id="3" id="stop-3">
           <h2 class="stop-title">Table Mountain</h2>
         </article>
 
-        <!-- Stop 4 -->
-        <article class="stop-card" data-stop-index="3" id="stop-3">
+        <!-- Stop 4 (Frames 156 - 198) -->
+        <article class="stop-card" data-stop-id="4" id="stop-4">
           <h2 class="stop-title">Boulders Beach</h2>
         </article>
 
-        <!-- Stop 5 -->
-        <article class="stop-card" data-stop-index="4" id="stop-4">
+        <!-- Stop 5 (Frames 218 - 263) -->
+        <article class="stop-card" data-stop-id="5" id="stop-5">
           <h2 class="stop-title">Cape of Good Hope</h2>
         </article>
 
-        <!-- Stop 6 -->
-        <article class="stop-card" data-stop-index="5" id="stop-5">
+        <!-- Stop 6 (Frames 272 - 308) -->
+        <article class="stop-card" data-stop-id="6" id="stop-6">
           <h2 class="stop-title">Cape Point Nature Reserve</h2>
         </article>
 
-        <!-- Stop 7 -->
-        <article class="stop-card" data-stop-index="6" id="stop-6">
+        <!-- Stop 7 (Frames 318 - 363) -->
+        <article class="stop-card" data-stop-id="7" id="stop-7">
           <h2 class="stop-title">Kirstenbosch Gardens</h2>
         </article>
 
-        <!-- Stop 8 -->
-        <article class="stop-card" data-stop-index="7" id="stop-7">
+        <!-- Stop 8 (Frames 378 - 422) -->
+        <article class="stop-card" data-stop-id="8" id="stop-8">
           <h2 class="stop-title">Groot Constantia</h2>
         </article>
 
-        <!-- Stop 9 -->
-        <article class="stop-card" data-stop-index="8" id="stop-8">
+        <!-- Stop 9 (Frames 434 - 449) -->
+        <article class="stop-card" data-stop-id="9" id="stop-9">
           <h2 class="stop-title">Franschhoek Winelands</h2>
         </article>
 
