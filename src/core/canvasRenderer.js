@@ -1,5 +1,5 @@
 // =============================================================================
-// Cape Town Tour Guide — DPR-Aware Canvas Renderer (Cover Math)
+// Cape Town Tour Guide — DPR-Aware Canvas Renderer (16:9 Framed Math)
 // =============================================================================
 
 let canvas = null;
@@ -9,24 +9,26 @@ let lastRenderedIndex = -1;
 let currentFrameIndex = 0;
 let onResizeCallback = null;
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
- * Updates canvas buffer dimensions according to viewport and DPR (capped at 2),
- * and restores high-quality image smoothing.
+ * Updates canvas buffer dimensions according to container dimensions and DPR (capped at 2).
+ * Maintains strict 16:9 aspect ratio and configures high quality image smoothing.
  * @returns {void}
  */
 export function updateCanvasDimensions() {
   if (!canvas || !ctx) return;
+  const rect = canvas.getBoundingClientRect();
+  const displayWidth = Math.round(rect.width) || canvas.clientWidth || 720;
+  const displayHeight = Math.round(rect.height) || Math.round(displayWidth * (9 / 16));
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.floor(window.innerWidth * dpr);
-  canvas.height = Math.floor(window.innerHeight * dpr);
+
+  canvas.width = Math.floor(displayWidth * dpr);
+  canvas.height = Math.floor(displayHeight * dpr);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 }
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
  * Draws an image element onto the canvas using cover-scaling geometry.
  * The image is centered and scaled without stretching or letterboxing.
@@ -55,13 +57,12 @@ function drawCover(img) {
   ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
 }
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
  * Renders the frame at the specified target index.
- * Deduplicates calls if the resolved frame index has not changed since last paint.
+ * Deduplicates paints if the frame record matches the last rendered frame unless force is true.
  * @param {number} targetIndex - Desired frame sequence index.
- * @param {boolean} [force=false] - Force redraw regardless of index match (e.g. on resize).
+ * @param {boolean} [force=false] - Force redraw regardless of duplicate index.
  * @returns {void}
  */
 export function renderFrame(targetIndex, force = false) {
@@ -78,11 +79,18 @@ export function renderFrame(targetIndex, force = false) {
   drawCover(frameRecord.img);
 }
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
- * Handles window resize events: resizes canvas buffer, forces a frame redraw,
- * and notifies the orchestrator (e.g. to refresh ScrollTrigger).
+ * Returns the currently active target frame index.
+ * @returns {number} Active target frame index.
+ */
+export function getCurrentFrameIndex() {
+  return currentFrameIndex;
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Handles window resize events: recalibrates canvas dimensions and triggers re-render.
  * @returns {void}
  */
 function handleResize() {
@@ -93,13 +101,12 @@ function handleResize() {
   }
 }
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
- * Initializes the canvas renderer with target element, frame resolver, and resize hook.
- * @param {HTMLCanvasElement} canvasElement - The canvas DOM element.
+ * Initializes the canvas renderer with target element, frame resolver, and resize callback.
+ * @param {HTMLCanvasElement} canvasElement - Target canvas DOM node.
  * @param {Function} frameResolverFn - Function mapping frame index to frame record.
- * @param {Function} [resizeHook] - Optional callback invoked after canvas resize.
+ * @param {Function} [resizeHook] - Optional callback executed after canvas dimension change.
  * @returns {void}
  */
 export function initCanvasRenderer(canvasElement, frameResolverFn, resizeHook) {
@@ -114,4 +121,4 @@ export function initCanvasRenderer(canvasElement, frameResolverFn, resizeHook) {
   window.addEventListener('resize', handleResize);
 }
 
-// -----------------------------------------------------------------------------
+//------------------------------End of file---------------------------------------------------//

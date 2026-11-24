@@ -1,50 +1,72 @@
 // =============================================================================
-// Cape Town Tour Guide — GSAP & ScrollTrigger Controller
+// Cape Private Tours — GSAP & ScrollTrigger Controller (Cinema Frame Mode)
 // =============================================================================
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SCROLL_DISTANCE } from '../config/tourConfig.js';
+import { TOTAL_FRAMES, OPTION_B_SCROLL_DISTANCE } from '../config/tourConfig.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
 let masterTimeline = null;
+let currentProgress = 0;
+let currentFrameIndex = 0;
+let registeredFrameTick = null;
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
- * Initializes the pinned scroll timeline scrubbing through totalFrames.
- * Calls onUpdateCallback on every inertia and scrub update with (currentFrame, progress).
- * @param {number} totalFrames - Total number of indexed frames (e.g. 450).
- * @param {Function} onUpdateCallback - Callback invoked on each scrub tick with (currentFrame, progress).
- * @returns {gsap.core.Timeline} The instantiated GSAP timeline.
+ * Tears down existing ScrollTrigger instances and kills the master timeline.
+ * @returns {void}
  */
-export function initScrollController(totalFrames, onUpdateCallback) {
+export function killScrollController() {
   if (masterTimeline) {
+    if (masterTimeline.scrollTrigger) {
+      masterTimeline.scrollTrigger.kill(true);
+    }
     masterTimeline.kill();
+    masterTimeline = null;
   }
+  const existingTriggers = ScrollTrigger.getAll();
+  for (const trigger of existingTriggers) {
+    if (trigger.vars && trigger.vars.id === 'showcase-scroll-trigger') {
+      trigger.kill(true);
+    }
+  }
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Sets up the pinned Cinema Frame timeline and ScrollTrigger scrubbing.
+ * @param {number} totalFrames - Total sequence frame count (450).
+ * @param {Function} onFrameTick - Callback with (currentFrame, progress).
+ * @returns {gsap.core.Timeline|null} The instantiated GSAP timeline.
+ */
+function setupCinemaScroll(totalFrames, onFrameTick) {
+  const showcaseSection = document.getElementById('explore') || document.querySelector('.showcase-section');
+  const pinnedWrapper = document.getElementById('showcase-pinned-wrapper');
+  if (!showcaseSection || !pinnedWrapper) return null;
 
   const playhead = { frame: 0 };
 
   masterTimeline = gsap.timeline({
     scrollTrigger: {
-      trigger: '#scroll-track',
+      id: 'showcase-scroll-trigger',
+      trigger: pinnedWrapper,
       start: 'top top',
-      end: `+=${SCROLL_DISTANCE}`,
-      pin: '#pinned-viewport',
+      end: `+=${OPTION_B_SCROLL_DISTANCE}`,
+      pin: pinnedWrapper,
       scrub: 0.5,
       anticipatePin: 1,
       onUpdate: (self) => {
-        const progress = self.progress;
-        const currentFrame = Math.round(playhead.frame);
-        if (onUpdateCallback) {
-          onUpdateCallback(currentFrame, progress);
+        currentProgress = self.progress;
+        currentFrameIndex = Math.round(playhead.frame);
+        if (onFrameTick) {
+          onFrameTick(currentFrameIndex, currentProgress);
         }
       }
     }
   });
 
-  // Scrub frame playhead from 0 to totalFrames - 1
   masterTimeline.to(
     playhead,
     {
@@ -52,27 +74,67 @@ export function initScrollController(totalFrames, onUpdateCallback) {
       ease: 'none',
       duration: 1.0,
       onUpdate: () => {
-        const currentFrame = Math.round(playhead.frame);
-        const progress = masterTimeline ? masterTimeline.progress() : 0;
-        if (onUpdateCallback) {
-          onUpdateCallback(currentFrame, progress);
+        currentFrameIndex = Math.round(playhead.frame);
+        const prog = masterTimeline ? masterTimeline.progress() : 0;
+        currentProgress = prog;
+        if (onFrameTick) {
+          onFrameTick(currentFrameIndex, prog);
         }
       }
     },
     0
   );
 
+  if (currentProgress > 0) {
+    masterTimeline.progress(currentProgress);
+  }
+
   return masterTimeline;
 }
 
-// -----------------------------------------------------------------------------
-
+//------------------------------------------------------------------------------------//
 /**
- * Forces ScrollTrigger to recalculate viewport positions and pin spacers.
+ * Initializes the scroll controller for the pinned Cinema Frame showcase.
+ * @param {number} [totalFrames=TOTAL_FRAMES] - Total frame count.
+ * @param {Function} [onFrameTick=null] - Callback invoked on each scrub update.
+ * @returns {gsap.core.Timeline|null} The initialized timeline or null.
+ */
+export function initScrollController(totalFrames = TOTAL_FRAMES, onFrameTick = null) {
+  killScrollController();
+  if (onFrameTick) {
+    registeredFrameTick = onFrameTick;
+  }
+
+  setupCinemaScroll(totalFrames, registeredFrameTick);
+  ScrollTrigger.refresh();
+  return masterTimeline;
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Triggers a manual ScrollTrigger layout refresh calculation.
  * @returns {void}
  */
 export function refreshScroll() {
   ScrollTrigger.refresh();
 }
 
-// -----------------------------------------------------------------------------
+//------------------------------------------------------------------------------------//
+/**
+ * Returns the current normalized scroll progress (0.0 - 1.0).
+ * @returns {number} Current progress.
+ */
+export function getScrollProgress() {
+  return currentProgress;
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Returns the currently active layout mode identifier.
+ * @returns {string} Always returns 'cinema-frame'.
+ */
+export function getCurrentScrollMode() {
+  return 'cinema-frame';
+}
+
+//------------------------------End of file---------------------------------------------------//

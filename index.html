@@ -3,98 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cape Town Tour Guide — Scroll-Driven Sequence</title>
+  <title>Cape Private Tours — Private Cape Town Guiding by Johan Brink</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/src/styles/tokens.css">
   <link rel="stylesheet" href="/src/styles/base.css">
   <link rel="stylesheet" href="/src/styles/components.css">
 </head>
-<body>
+<body class="page-home">
 
-  <!-- Full-Screen Progressive Loading Overlay -->
-  <aside id="loader-overlay" class="loader-overlay" aria-live="polite">
-    <div class="loader-panel">
-      <div class="loader-header">
-        <span class="loader-tag">INITIALIZING RUNTIME</span>
-        <span class="loader-status-code">SYS-OK</span>
-      </div>
-      <div class="loader-counter-wrap">
-        <span id="loader-percentage" class="loader-percentage">0%</span>
-      </div>
-      <div class="loader-bar-track">
-        <div id="loader-bar" class="loader-bar-fill"></div>
-      </div>
-      <div class="loader-meta">
-        <span id="loader-status-text" class="loader-meta-text">BUFFERING INITIAL ASSETS (0 / 40)</span>
-        <span class="loader-meta-sub">FRAME_STEP: 2 // COVER SCALING ACTIVE</span>
+  <!-- Transparent Overlaid Navigation Bar -->
+  <header class="site-nav" role="banner">
+    <div class="nav-container">
+      <a href="#hero" class="nav-brand" aria-label="Cape Private Tours Home">
+        <span class="brand-text">CAPE PRIVATE TOURS</span>
+      </a>
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#explore" class="nav-link">Explore</a>
+        <a href="#guide" class="nav-link">Your Guide</a>
+        <a href="#reviews" class="nav-link">Reviews</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="booking.html" class="btn-primary nav-btn">Plan Your Tour</a>
       </div>
     </div>
+  </header>
+
+  <!-- Full-Bleed Photographic Hero (Lower-Left Focus Over Real Photo) -->
+  <section id="hero" class="hero-section" aria-label="Introduction">
+    <div class="hero-scrim-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-headline">Private Cape Town Journeys, Shaped by the Wind &amp; Ocean</h1>
+      <p class="hero-subcopy">
+        Single-vehicle exploring with an accredited local specialist. No coach buses, no crowded itineraries&mdash;just the Cape at your pace.
+      </p>
+      <div class="hero-actions">
+        <a href="booking.html" class="btn-primary">Plan Your Tour</a>
+        <a href="#explore" class="hero-scroll-prompt">Explore What Cape Town Offers &darr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Cinema Frame Showcase (#explore — Sole Locked-In View) -->
+  <section id="explore" class="showcase-section" aria-label="Destination Showcase">
+    <div id="showcase-section-body" class="showcase-body">
+      <div id="showcase-pinned-wrapper" class="showcase-pinned-wrapper">
+        <div id="showcase-container" class="showcase-container">
+
+          <!-- Section Header -->
+          <div class="showcase-intro">
+            <h2 class="showcase-title">What Cape Town Has to Offer</h2>
+            <p class="showcase-subcopy">
+              From quiet penguin coves to historic mountain vineyards&mdash;scroll to explore a few of the places I can weave into your private day.
+            </p>
+          </div>
+
+          <!-- Pinned 16:9 Canvas Column -->
+          <div id="showcase-canvas-col" class="showcase-canvas-col">
+            <div class="canvas-frame-box">
+              <canvas id="sequence-canvas" class="sequence-canvas"></canvas>
+
+              <!-- Non-Blocking Buffer Overlay -->
+              <div id="canvas-loader" class="canvas-loader-overlay is-hidden" aria-live="polite">
+                <span id="canvas-loader-text" class="canvas-loader-text">Loading tour frames...</span>
+              </div>
+            </div>
+
+            <!-- Cinema Caption Bar Directly Beneath Frame -->
+            <div id="travelogue-caption-bar" class="travelogue-caption-bar is-visible" aria-live="polite">
+              <h3 id="caption-name" class="caption-name">Bo-Kaap</h3>
+              <div class="caption-progress-track" role="progressbar" aria-label="Tour scroll progress">
+                <div id="caption-progress-fill" class="caption-progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet Your Guide & Real Moments (#guide) -->
+  <section id="guide" class="guide-section" aria-label="Meet Your Guide">
+    <div class="guide-container">
+
+      <!-- Left Column: Open Magazine-Style Photo Mosaic -->
+      <div class="guide-mosaic">
+        <div class="mosaic-img-box tall">
+          <img src="/images/guide.webp" alt="Johan Brink, Private Cape Town Tour Guide" class="mosaic-img" loading="lazy">
+        </div>
+        <div class="mosaic-img-box">
+          <img src="/images/vehicle.webp" alt="Executive 4x4 Private Tour Vehicle" class="mosaic-img" loading="lazy">
+        </div>
+        <div class="mosaic-img-box">
+          <img src="/images/coastal.webp" alt="Coastal cliff trail at Cape Point" class="mosaic-img" loading="lazy">
+        </div>
+      </div>
+
+      <!-- Right Column: Warm Human Story & 3 Touring Highlights -->
+      <div class="guide-story-col">
+        <h2 class="guide-headline">Meet Johan Brink</h2>
+        <span class="guide-subline">Accredited Western Cape Tourism Specialist &amp; Private Guide</span>
+
+        <div class="guide-paragraphs">
+          <p>
+            Born and raised beneath Table Mountain, I have spent over fifteen years exploring every quiet corner, coastal footpath, and mountain pass across the Cape Peninsula and Winelands.
+          </p>
+          <p>
+            Private touring means zero rigid tour-bus schedules. We travel together in a dedicated private vehicle, shaping each day around the morning wind, coastal light, and your personal curiosities.
+          </p>
+        </div>
+
+        <!-- 3 Clean Touring Highlights -->
+        <div class="tour-highlights-grid">
+          <div class="highlight-row">
+            <h4 class="highlight-title">Weather &amp; Light First</h4>
+            <p class="highlight-text">If Table Mountain is draped in cloud at 9 AM, we drive south to the penguins and catch the summit when afternoon skies clear.</p>
+          </div>
+          <div class="highlight-row">
+            <h4 class="highlight-title">Your Vehicle, Your Pace</h4>
+            <p class="highlight-text">Linger over cellar tastings or stop for roadside farmstall coffee without watching the clock.</p>
+          </div>
+          <div class="highlight-row">
+            <h4 class="highlight-title">Local Tables &amp; Cellars</h4>
+            <p class="highlight-text">Skip tourist buffets for fresh harbour catches, neighborhood bakeries, and boutique family vineyards.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Guest Stories & Experiences (#reviews) -->
+  <section id="reviews" class="reviews-section" aria-label="Guest Stories">
+    <div class="reviews-container">
+      <div class="reviews-header">
+        <h2 class="reviews-title">Guest Stories</h2>
+        <p class="reviews-subcopy">
+          Reflections from travelers who explored Cape Town and the Peninsula with me.
+        </p>
+        <div class="reviews-action-center">
+          <button type="button" id="btn-toggle-review-form" class="btn-secondary" aria-expanded="false">
+            Leave a Review
+          </button>
+        </div>
+
+        <!-- Inline Review Submission Drawer -->
+        <div id="review-form-wrap" class="review-form-drawer">
+          <form id="guest-review-form" class="guest-review-form" novalidate>
+            <h3 class="drawer-form-title">Share Your Experience</h3>
+            <div class="form-grid-2">
+              <div class="form-field">
+                <label for="review-name" class="field-label">Your Name</label>
+                <input type="text" id="review-name" required placeholder="e.g. Sarah Miller">
+              </div>
+              <div class="form-field">
+                <label for="review-country" class="field-label">City &amp; Country</label>
+                <input type="text" id="review-country" required placeholder="e.g. Boston, USA">
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="review-rating" class="field-label">Rating</label>
+              <select id="review-rating">
+                <option value="5" selected>5 Stars - Exceptional</option>
+                <option value="4">4 Stars - Very Good</option>
+                <option value="3">3 Stars - Good</option>
+                <option value="2">2 Stars - Fair</option>
+                <option value="1">1 Star - Poor</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="review-text" class="field-label">Your Story</label>
+              <textarea id="review-text" rows="3" required placeholder="What made your day across the Cape memorable?"></textarea>
+            </div>
+            <div class="form-status" id="review-form-status" role="status" aria-live="polite"></div>
+            <div>
+              <button type="submit" class="btn-primary">Submit Review</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Open 3-Column Stories Grid -->
+      <div id="reviews-grid" class="reviews-grid">
+        <!-- Rendered by reviewManager.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Custom Tour Invitation Band -->
+  <section class="closing-band" aria-label="Plan Your Journey">
+    <div class="closing-container">
+      <h2 class="closing-headline">Every Cape Town day is planned individually.</h2>
+      <p class="closing-subtext">
+        Tell me what you would like to see, and I will tailor a day around your travel pace. Private vehicle, flexible timing, and dedicated guiding.
+      </p>
+      <a href="booking.html" class="btn-primary">Plan Your Tour</a>
+    </div>
+  </section>
+
+  <!-- Minimal Clean Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-container">
+      <span class="footer-copy">&copy; 2026 Cape Private Tours. Guided by Johan Brink.</span>
+      <nav class="footer-links" aria-label="Footer Links">
+        <a href="#explore" class="footer-link">Explore</a>
+        <a href="#guide" class="footer-link">Your Guide</a>
+        <a href="#reviews" class="footer-link">Reviews</a>
+        <a href="booking.html" class="footer-link">Plan Tour</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Debug HUD Panel (Toggled with 'D' key) -->
+  <aside id="debug-hud" class="debug-hud" aria-label="Debug Sequence HUD" role="status">
+    <!-- Populated by debugHud.js -->
   </aside>
 
-  <!-- Fixed Top Scroll Progress Bar -->
-  <div class="scroll-progress-line" role="progressbar" aria-label="Tour scroll progress">
-    <div id="scroll-progress-bar" class="scroll-progress-fill"></div>
-  </div>
-
-  <!-- Main Scroll Container (12000px virtual track for GSAP ScrollTrigger) -->
-  <main id="scroll-track" class="scroll-track">
-    <!-- Pinned Viewport (100vw x 100vh) -->
-    <div id="pinned-viewport" class="pinned-viewport">
-      <canvas id="sequence-canvas" class="sequence-canvas"></canvas>
-
-      <!-- Lower-Left Overlays Container (Exact Frame-Based Trigger Points) -->
-      <section class="overlay-container" aria-label="Cape Town Tour Stops">
-
-        <!-- Stop 1 (Frames 0 - 22) -->
-        <article class="stop-card" data-stop-id="1" id="stop-1">
-          <h2 class="stop-title">Bo-Kaap</h2>
-        </article>
-
-        <!-- Stop 2 (Frames 34 - 71) -->
-        <article class="stop-card" data-stop-id="2" id="stop-2">
-          <h2 class="stop-title">Lion's Head</h2>
-        </article>
-
-        <!-- Stop 3 (Frames 90 - 126) -->
-        <article class="stop-card" data-stop-id="3" id="stop-3">
-          <h2 class="stop-title">Table Mountain</h2>
-        </article>
-
-        <!-- Stop 4 (Frames 156 - 198) -->
-        <article class="stop-card" data-stop-id="4" id="stop-4">
-          <h2 class="stop-title">Boulders Beach</h2>
-        </article>
-
-        <!-- Stop 5 (Frames 218 - 263) -->
-        <article class="stop-card" data-stop-id="5" id="stop-5">
-          <h2 class="stop-title">Cape of Good Hope</h2>
-        </article>
-
-        <!-- Stop 6 (Frames 272 - 308) -->
-        <article class="stop-card" data-stop-id="6" id="stop-6">
-          <h2 class="stop-title">Cape Point Nature Reserve</h2>
-        </article>
-
-        <!-- Stop 7 (Frames 318 - 363) -->
-        <article class="stop-card" data-stop-id="7" id="stop-7">
-          <h2 class="stop-title">Kirstenbosch Gardens</h2>
-        </article>
-
-        <!-- Stop 8 (Frames 378 - 422) -->
-        <article class="stop-card" data-stop-id="8" id="stop-8">
-          <h2 class="stop-title">Groot Constantia</h2>
-        </article>
-
-        <!-- Stop 9 (Frames 434 - 449) -->
-        <article class="stop-card" data-stop-id="9" id="stop-9">
-          <h2 class="stop-title">Franschhoek Winelands</h2>
-        </article>
-
-      </section>
-    </div>
-  </main>
-
-  <!-- Vite Vanilla Entry -->
+  <!-- Main JavaScript Bundle -->
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
+<!-- ------------------------------End of file--------------------------------------------------- -->

@@ -1,37 +1,98 @@
 /* =============================================================================
-   Cape Town Tour Guide — Design Tokens (Utilitarian Flat Design)
+   Cape Private Tours — Design Tokens & CSS Custom Properties
+   Crisp Coastal Palette & Gallery-Neutral Aesthetic
    ============================================================================= */
 
 :root {
   /* Surfaces & Backgrounds */
-  --color-bg-canvas: #050608;
-  --color-surface-base: #0a0c10;
-  --color-surface-panel: #0f1217;
-  --color-surface-raised: #151921;
-  --color-modal-backdrop: rgba(5, 6, 8, 0.88);
+  --color-bg-white: #FFFFFF;
+  --color-bg-sand: #F3F4F6;
+  --color-bg-fynbos: #11171A;
+  --color-bg-fynbos-light: #1A2226;
+  --color-surface-card: #FFFFFF;
+  --color-surface-card-hover: #F8F9FA;
+  --color-surface-input: #F3F4F6;
 
-  /* Sharp 1px Borders */
-  --color-border-subtle: #1c222c;
-  --color-border-sharp: #2b3342;
-  --color-border-highlight: #47546a;
-  
-  /* High-Contrast Typography */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #9ea7b8;
-  --color-text-muted: #5e687a;
-  --color-accent: #ffffff;
-  --color-accent-inverse: #050608;
+  /* Natural Photo Scrim Gradients (Lightened top for sky visibility, grounded bottom) */
+  --color-scrim-top: rgba(17, 23, 26, 0.40);
+  --color-scrim-clear: rgba(17, 23, 26, 0);
+  --color-scrim-bottom: rgba(17, 23, 26, 0.90);
 
-  /* System Fonts Only (Zero External Network Requests) */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", "Liberation Mono", Menlo, Monaco, Consolas, monospace;
+  /* Primary & Secondary Typography */
+  --color-text-charcoal: #14171A;
+  --color-text-muted: #4E565C;
+  --color-text-light: #6B747B;
+  --color-text-white: #FFFFFF;
+  --color-text-white-90: rgba(255, 255, 255, 0.9);
+  --color-text-white-85: rgba(255, 255, 255, 0.85);
+  --color-text-white-80: rgba(255, 255, 255, 0.8);
+  --color-text-fynbos: #11171A;
 
-  /* Z-Index Layers */
-  --z-canvas: 1;
-  --z-overlay: 100;
-  --z-progress: 500;
-  --z-modal: 9000;
-  --z-loader: 10000;
+  /* Accents & CTA Colors (Deep Coastal Slate + Sun-Baked Ochre) */
+  --color-accent-terracotta: #162B30;
+  --color-accent-terracotta-hover: #0F1F23;
+  --color-accent-terracotta-active: #0A1619;
+  --color-accent-ochre: #B85D2A;
+  --color-accent-slate: #162B30;
+  --color-accent-slate-hover: #0F1F23;
+
+  /* Inverted Button on Dark Bands (Hero & Closing Band) */
+  --color-btn-darkband-bg: #FFFFFF;
+  --color-btn-darkband-text: #14171A;
+  --color-btn-darkband-border: #FFFFFF;
+  --color-btn-darkband-hover-bg: #F3F4F6;
+
+  /* Borders & Hairlines */
+  --color-border-sand: #E2E6EA;
+  --color-border-sand-light: #E2E6EA;
+  --color-border-sand-dark: #CCD2D8;
+  --color-border-fynbos: #222C30;
+  --color-border-fynbos-light: #2A363B;
+  --color-border-terracotta: #162B30;
+
+  /* Form Inputs & Textareas */
+  --color-input-bg: #F3F4F6;
+  --color-input-border: #CCD2D8;
+  --color-input-focus: #162B30;
+
+  /* Wizard & Segmented Controls */
+  --color-pill-bg: #FFFFFF;
+  --color-pill-text: #14171A;
+  --color-pill-border: #CCD2D8;
+  --color-pill-active-bg: #162B30;
+  --color-pill-active-text: #FFFFFF;
+  --color-pill-active-border: #162B30;
+
+  --color-segment-bg: #E2E6EA;
+  --color-segment-text: #4E565C;
+  --color-segment-active-bg: #162B30;
+  --color-segment-active-text: #FFFFFF;
+
+  /* Progress & Indicators */
+  --color-progress-track: rgba(255, 255, 255, 0.22);
+  --color-progress-fill: #B85D2A;
+  --color-step-active: #B85D2A;
+  --color-step-inactive: #6B747B;
+  --color-step-done: #162B30;
+
+  /* HUD */
+  --color-hud-bg: #11171A;
+  --color-hud-text: #FFFFFF;
+  --color-hud-border: #2A363B;
+  --color-hud-accent: #B85D2A;
+  --color-hud-muted: #CCD2D8;
+
+  /* Typography Stacks (Local System Fonts Only) */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  /* Z-Index Hierarchy */
+  --z-base: 1;
+  --z-canvas: 10;
+  --z-sticky: 100;
+  --z-nav: 500;
+  --z-hud: 1000;
 }
 
-/* ----------------------------------------------------------------------------- */
+/* ------------------------------End of file--------------------------------------------------- */
