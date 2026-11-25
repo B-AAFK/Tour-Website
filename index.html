@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cape Private Tours — Private Cape Town Guiding by Johan Brink</title>
+  <title>Cape Private Tours — Private Cape Town Guiding by Lance Bowes</title>
+  <meta name="description" content="Private Cape Town and Western Cape tours with accredited local guide Lance Bowes. Custom routes shaped around weather, coastal light, and your pace.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/src/styles/tokens.css">
   <link rel="stylesheet" href="/src/styles/base.css">
@@ -23,10 +24,31 @@
         <a href="#reviews" class="nav-link">Reviews</a>
       </nav>
       <div class="nav-actions">
-        <a href="booking.html" class="btn-primary nav-btn">Plan Your Tour</a>
+        <a href="booking.html" class="btn-primary nav-btn">
+          <span>Plan Your Tour</span>
+          <span class="icon-glyph icon-sm" data-icon="arrow-right" aria-hidden="true"></span>
+        </a>
+        <button
+          type="button"
+          id="mobile-nav-toggle"
+          class="mobile-nav-toggle"
+          aria-expanded="false"
+          aria-controls="mobile-nav-drawer"
+          aria-label="Open navigation menu"
+        >
+          <span class="icon-glyph icon-md" data-icon="menu" aria-hidden="true"></span>
+        </button>
       </div>
     </div>
+    <nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-label="Mobile Navigation" aria-hidden="true">
+      <a href="#explore" class="mobile-drawer-link">Explore Cape Town</a>
+      <a href="#guide" class="mobile-drawer-link">Your Guide</a>
+      <a href="#reviews" class="mobile-drawer-link">Guest Stories</a>
+    </nav>
   </header>
+
+  <!-- Main Page Content -->
+  <main id="main-content">
 
   <!-- Full-Bleed Photographic Hero (Lower-Left Focus Over Real Photo) -->
   <section id="hero" class="hero-section" aria-label="Introduction">
@@ -37,8 +59,14 @@
         Single-vehicle exploring with an accredited local specialist. No coach buses, no crowded itineraries&mdash;just the Cape at your pace.
       </p>
       <div class="hero-actions">
-        <a href="booking.html" class="btn-primary">Plan Your Tour</a>
-        <a href="#explore" class="hero-scroll-prompt">Explore What Cape Town Offers &darr;</a>
+        <a href="booking.html" class="btn-primary">
+          <span>Plan Your Tour</span>
+          <span class="icon-glyph icon-sm" data-icon="arrow-right" aria-hidden="true"></span>
+        </a>
+        <a href="#explore" class="hero-scroll-prompt">
+          <span>Explore What Cape Town Offers</span>
+          <span class="icon-glyph icon-sm" data-icon="arrow-down" aria-hidden="true"></span>
+        </a>
       </div>
     </div>
   </section>
@@ -68,12 +96,18 @@
               </div>
             </div>
 
-            <!-- Cinema Caption Bar Directly Beneath Frame -->
+            <!-- Cinema Caption Bar & Interactive Chapter Scrubber -->
             <div id="travelogue-caption-bar" class="travelogue-caption-bar is-visible" aria-live="polite">
-              <h3 id="caption-name" class="caption-name">Bo-Kaap</h3>
+              <div class="caption-meta-row">
+                <span id="caption-region" class="caption-region-tag">City Bowl</span>
+                <h3 id="caption-name" class="caption-name">Bo-Kaap</h3>
+              </div>
               <div class="caption-progress-track" role="progressbar" aria-label="Tour scroll progress">
                 <div id="caption-progress-fill" class="caption-progress-fill"></div>
               </div>
+              <nav id="chapter-scrubber" class="chapter-scrubber" aria-label="Jump to Cape Town Chapter">
+                <!-- Populated by overlayManager.js -->
+              </nav>
             </div>
           </div>
 
@@ -82,6 +116,14 @@
     </div>
   </section>
 
+  <!-- Ndebele-Inspired Geometric Section Divider -->
+  <div class="ndebele-rule" aria-hidden="true">
+    <span class="ndebele-seg-city"></span>
+    <span class="ndebele-seg-sun"></span>
+    <span class="ndebele-seg-peninsula"></span>
+    <span class="ndebele-seg-flora"></span>
+  </div>
+
   <!-- Meet Your Guide & Real Moments (#guide) -->
   <section id="guide" class="guide-section" aria-label="Meet Your Guide">
     <div class="guide-container">
@@ -89,7 +131,7 @@
       <!-- Left Column: Open Magazine-Style Photo Mosaic -->
       <div class="guide-mosaic">
         <div class="mosaic-img-box tall">
-          <img src="/images/guide.webp" alt="Johan Brink, Private Cape Town Tour Guide" class="mosaic-img" loading="lazy">
+          <img src="/images/guide.webp" alt="Lance Bowes, Private Cape Town Tour Guide" class="mosaic-img" loading="lazy">
         </div>
         <div class="mosaic-img-box">
           <img src="/images/vehicle.webp" alt="Executive 4x4 Private Tour Vehicle" class="mosaic-img" loading="lazy">
@@ -99,34 +141,48 @@
         </div>
       </div>
 
-      <!-- Right Column: Warm Human Story & 3 Touring Highlights -->
+      <!-- Right Column: Guide Story, 3 Touring Highlights & Live Weather Pivot -->
       <div class="guide-story-col">
-        <h2 class="guide-headline">Meet Johan Brink</h2>
+        <h2 class="guide-headline">Meet Lance Bowes</h2>
         <span class="guide-subline">Accredited Western Cape Tourism Specialist &amp; Private Guide</span>
 
         <div class="guide-paragraphs">
           <p>
-            Born and raised beneath Table Mountain, I have spent over fifteen years exploring every quiet corner, coastal footpath, and mountain pass across the Cape Peninsula and Winelands.
+            Guide bio placeholder &mdash; Lance Bowes will add his personal introduction, guiding background across the Western Cape, and approach to private day tours here.
           </p>
           <p>
-            Private touring means zero rigid tour-bus schedules. We travel together in a dedicated private vehicle, shaping each day around the morning wind, coastal light, and your personal curiosities.
+            Additional guide notes on travel pace, local perspective, and tailoring each day around guests will be provided by the guide.
           </p>
         </div>
 
-        <!-- 3 Clean Touring Highlights -->
+        <!-- 3 Icon-Anchored Touring Highlights -->
         <div class="tour-highlights-grid">
           <div class="highlight-row">
-            <h4 class="highlight-title">Weather &amp; Light First</h4>
-            <p class="highlight-text">If Table Mountain is draped in cloud at 9 AM, we drive south to the penguins and catch the summit when afternoon skies clear.</p>
+            <h3 class="highlight-title">
+              <span class="icon-glyph icon-md highlight-icon" data-icon="cloud-sun" aria-hidden="true"></span>
+              <span>Weather &amp; Light First</span>
+            </h3>
+            <p class="highlight-text">Placeholder description &mdash; Lance Bowes will provide details on how he adapts routes around Cape Town wind, cloud cover, and light.</p>
           </div>
           <div class="highlight-row">
-            <h4 class="highlight-title">Your Vehicle, Your Pace</h4>
-            <p class="highlight-text">Linger over cellar tastings or stop for roadside farmstall coffee without watching the clock.</p>
+            <h3 class="highlight-title">
+              <span class="icon-glyph icon-md highlight-icon" data-icon="car" aria-hidden="true"></span>
+              <span>Your Vehicle, Your Pace</span>
+            </h3>
+            <p class="highlight-text">Placeholder description &mdash; Lance Bowes will provide details on the private touring vehicle and flexible daily schedule.</p>
           </div>
           <div class="highlight-row">
-            <h4 class="highlight-title">Local Tables &amp; Cellars</h4>
-            <p class="highlight-text">Skip tourist buffets for fresh harbour catches, neighborhood bakeries, and boutique family vineyards.</p>
+            <h3 class="highlight-title">
+              <span class="icon-glyph icon-md highlight-icon" data-icon="utensils" aria-hidden="true"></span>
+              <span>Local Tables &amp; Cellars</span>
+            </h3>
+            <p class="highlight-text">Placeholder description &mdash; Lance Bowes will provide details on his preferred harbour tables, bakeries, and local wine estates.</p>
           </div>
+        </div>
+
+        <!-- Interactive "How I Read the Day" Weather Micro-Toggle -->
+        <div id="guide-weather-widget" class="guide-weather-widget">
+          <!-- Populated by guideWeather.js -->
         </div>
       </div>
 
@@ -143,7 +199,8 @@
         </p>
         <div class="reviews-action-center">
           <button type="button" id="btn-toggle-review-form" class="btn-secondary" aria-expanded="false">
-            Leave a Review
+            <span class="icon-glyph icon-sm" data-icon="edit" aria-hidden="true"></span>
+            <span class="btn-label">Leave a Review</span>
           </button>
         </div>
 
@@ -154,22 +211,22 @@
             <div class="form-grid-2">
               <div class="form-field">
                 <label for="review-name" class="field-label">Your Name</label>
-                <input type="text" id="review-name" required placeholder="e.g. Sarah Miller">
+                <input type="text" id="review-name" name="reviewerName" autocomplete="name" required placeholder="e.g. Sarah Miller">
               </div>
               <div class="form-field">
                 <label for="review-country" class="field-label">City &amp; Country</label>
-                <input type="text" id="review-country" required placeholder="e.g. Boston, USA">
+                <input type="text" id="review-country" name="reviewerCountry" autocomplete="country-name" required placeholder="e.g. Boston, USA">
               </div>
             </div>
             <div class="form-field">
-              <label for="review-rating" class="field-label">Rating</label>
-              <select id="review-rating">
-                <option value="5" selected>5 Stars - Exceptional</option>
-                <option value="4">4 Stars - Very Good</option>
-                <option value="3">3 Stars - Good</option>
-                <option value="2">2 Stars - Fair</option>
-                <option value="1">1 Star - Poor</option>
-              </select>
+              <span class="field-label" id="review-rating-group-label">Your Rating</span>
+              <div class="star-picker-row">
+                <div id="review-star-picker" class="star-picker-group" role="radiogroup" aria-labelledby="review-rating-group-label">
+                  <!-- Populated by reviewManager.js -->
+                </div>
+                <span id="review-rating-label" class="star-picker-caption">5 Stars - Exceptional</span>
+              </div>
+              <input type="hidden" id="review-rating" value="5">
             </div>
             <div class="form-field">
               <label for="review-text" class="field-label">Your Story</label>
@@ -177,13 +234,16 @@
             </div>
             <div class="form-status" id="review-form-status" role="status" aria-live="polite"></div>
             <div>
-              <button type="submit" class="btn-primary">Submit Review</button>
+              <button type="submit" class="btn-primary">
+                <span>Submit Review</span>
+                <span class="icon-glyph icon-sm" data-icon="arrow-right" aria-hidden="true"></span>
+              </button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Open 3-Column Stories Grid -->
+      <!-- Asymmetric Editorial Guest Stories Grid -->
       <div id="reviews-grid" class="reviews-grid">
         <!-- Rendered by reviewManager.js -->
       </div>
@@ -195,16 +255,21 @@
     <div class="closing-container">
       <h2 class="closing-headline">Every Cape Town day is planned individually.</h2>
       <p class="closing-subtext">
-        Tell me what you would like to see, and I will tailor a day around your travel pace. Private vehicle, flexible timing, and dedicated guiding.
+        Tell me what you would like to see, and I will shape a day around your travel pace. Private vehicle, flexible timing, and dedicated guiding.
       </p>
-      <a href="booking.html" class="btn-primary">Plan Your Tour</a>
+      <a href="booking.html" class="btn-primary">
+        <span>Plan Your Tour</span>
+        <span class="icon-glyph icon-sm" data-icon="arrow-right" aria-hidden="true"></span>
+      </a>
     </div>
   </section>
+
+  </main>
 
   <!-- Minimal Clean Footer -->
   <footer class="site-footer" role="contentinfo">
     <div class="footer-container">
-      <span class="footer-copy">&copy; 2026 Cape Private Tours. Guided by Johan Brink.</span>
+      <span class="footer-copy">&copy; 2026 Cape Private Tours. Guided by Lance Bowes.</span>
       <nav class="footer-links" aria-label="Footer Links">
         <a href="#explore" class="footer-link">Explore</a>
         <a href="#guide" class="footer-link">Your Guide</a>

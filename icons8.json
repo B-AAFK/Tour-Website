@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "icons": {
+    "pack": "fluent-systems-regular",
+    "filledPair": "fluent-systems-filled",
+    "sizes": [16, 20, 24],
+    "color": "currentColor",
+    "format": "png",
+    "note": "Downloaded locally at 48px (2x) from Icons8 MCP get_icon_png_url and tinted via CSS mask-image + currentColor (Github Students Partnership plan has mcp_access: false for SVG).",
+    "items": {
+      "arrow-right": { "id": "b8rKT75QG14x", "commonName": "right", "file": "src/assets/icons/arrow-right.png" },
+      "arrow-left": { "id": "20i9yZTsnnmg", "commonName": "left", "file": "src/assets/icons/arrow-left.png" },
+      "arrow-down": { "id": "SXgJfhZdPksV", "commonName": "down", "file": "src/assets/icons/arrow-down.png" },
+      "menu": { "id": "quuyJoZCkYni", "commonName": "menu", "file": "src/assets/icons/menu.png" },
+      "close": { "id": "1NVn5K29mOSz", "commonName": "delete-sign", "file": "src/assets/icons/close.png" },
+      "wind": { "id": "ZZNucphlEBf9", "commonName": "wind", "file": "src/assets/icons/wind.png" },
+      "cloud-sun": { "id": "vRCpyBKENl5l", "commonName": "partly-cloudy-day", "file": "src/assets/icons/cloud-sun.png" },
+      "sun": { "id": "JHsm5oZeWqae", "commonName": "sun", "file": "src/assets/icons/sun.png" },
+      "car": { "id": "x4c15ldfVTY6", "commonName": "car", "file": "src/assets/icons/car.png" },
+      "utensils": { "id": "uiw5PzOSKTW8", "commonName": "restaurant", "file": "src/assets/icons/utensils.png" },
+      "star-outline": { "id": "tAfqdu2AVpjT", "commonName": "star", "file": "src/assets/icons/star-outline.png" },
+      "star-filled": { "id": "tf9WJOzzs4Wo", "commonName": "star", "pack": "fluent-systems-filled", "file": "src/assets/icons/star-filled.png" },
+      "quote": { "id": "ZMfUfcJga3R0", "commonName": "quote-left", "file": "src/assets/icons/quote.png" },
+      "edit": { "id": "sP6dvxdjJWj5", "commonName": "pencil", "file": "src/assets/icons/edit.png" },
+      "mountain": { "id": "CDD35pmawwyy", "commonName": "mountain", "file": "src/assets/icons/mountain.png" },
+      "lighthouse": { "id": "FAdK5Zc1Y2KO", "commonName": "lighthouse", "file": "src/assets/icons/lighthouse.png" },
+      "penguin": { "id": "Co8IA5eR5TWf", "commonName": "pinguin", "file": "src/assets/icons/penguin.png" },
+      "leaf": { "id": "jwqj3CpNLY3W", "commonName": "leaf", "file": "src/assets/icons/leaf.png" },
+      "wine": { "id": "EsdzyhMu1Rlw", "commonName": "wine-glass", "file": "src/assets/icons/wine.png" },
+      "road": { "id": "DvHoFO0szQ0v", "commonName": "road", "file": "src/assets/icons/road.png" },
+      "compass": { "id": "aBDIThwGtLKb", "commonName": "compass", "file": "src/assets/icons/compass.png" },
+      "clock": { "id": "6Z5IUAh18Fuc", "commonName": "clock", "file": "src/assets/icons/clock.png" },
+      "users": { "id": "TiSjQ8FV1EaP", "commonName": "group2", "file": "src/assets/icons/users.png" },
+      "calendar": { "id": "vwGXRtPWrZSn", "commonName": "calendar", "file": "src/assets/icons/calendar.png" },
+      "check-circle": { "id": "FCLWo59gBVtY", "commonName": "ok", "file": "src/assets/icons/check-circle.png" },
+      "location": { "id": "c0kUjxdWTRsk", "commonName": "marker", "file": "src/assets/icons/location.png" },
+      "city": { "id": "nRTauM1PWZU7", "commonName": "downtown", "file": "src/assets/icons/city.png" },
+      "sea-waves": { "id": "FBT9yKde8XKJ", "commonName": "sea-waves", "file": "src/assets/icons/sea-waves.png" }
+    }
+  },
+  "tokens": {
+    "iconColor": "--ink-primary",
+    "accent": "--accent-primary"
+  }
+}

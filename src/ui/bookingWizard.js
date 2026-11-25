@@ -1,14 +1,18 @@
 // =============================================================================
-// Cape Private Tours — 3-Step Progressive Booking Wizard Controller
+// Cape Private Tours — 2-Step Split-Screen Visual Concierge Controller
 // =============================================================================
 
+import { ASSET_BASE_URL, STOPS } from '../config/tourConfig.js';
+import { getIconMarkup } from './icons.js';
+
 let currentStep = 1;
-const wizardData = {
+const conciergeState = {
   destinations: [],
-  notes: '',
+  suggestRoute: false,
   duration: 'Full Day (8 hrs)',
   groupSize: '1–2 Guests',
   dates: '',
+  notes: '',
   name: '',
   email: '',
   phone: '',
@@ -17,247 +21,354 @@ const wizardData = {
 
 //------------------------------------------------------------------------------------//
 /**
- * Updates the visual step indicator and toggles the visible step panel.
- * @param {number} stepNumber - Step index (1, 2, or 3).
+ * Formats the selected route summary string for live readouts and recap banners.
+ * @returns {string} Human-readable summary of selected places or route suggestion.
+ */
+function formatPlacesSummary() {
+  if (conciergeState.suggestRoute) {
+    return 'Route suggested by Lance';
+  }
+  if (conciergeState.destinations.length > 0) {
+    return conciergeState.destinations.join(', ');
+  }
+  return 'Flexible Cape Town route';
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Updates the Step 1 bottom readout and Step 2 recap strip from current state.
+ * @returns {void}
+ */
+function syncSummaryDisplays() {
+  const readoutEl = document.getElementById('step1-live-readout');
+  if (readoutEl) {
+    let placePart = '0 places selected';
+    if (conciergeState.suggestRoute) {
+      placePart = 'Route suggested by Lance';
+    } else if (conciergeState.destinations.length === 1) {
+      placePart = '1 place selected';
+    } else if (conciergeState.destinations.length > 1) {
+      placePart = `${conciergeState.destinations.length} places selected`;
+    }
+    readoutEl.textContent = `${placePart} · ${conciergeState.duration}`;
+  }
+
+  const recapEl = document.getElementById('step2-recap-text');
+  if (recapEl) {
+    recapEl.textContent = `${conciergeState.duration} · ${conciergeState.groupSize} · ${formatPlacesSummary()}`;
+  }
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Transitions the right-hand workspace between Step 1 and Step 2.
+ * @param {number} stepNumber - Target step (1 or 2).
  * @returns {void}
  */
 export function goToStep(stepNumber) {
-  if (stepNumber < 1 || stepNumber > 3) return;
+  if (stepNumber !== 1 && stepNumber !== 2) return;
   currentStep = stepNumber;
 
-  const stepPanels = document.querySelectorAll('.wizard-step-panel');
-  stepPanels.forEach((panel) => {
-    const panelStep = parseInt(panel.dataset.step, 10);
-    if (panelStep === currentStep) {
-      panel.classList.add('is-active');
-    } else {
-      panel.classList.remove('is-active');
-    }
-  });
-
-  const stepIndicators = document.querySelectorAll('.step-indicator-item');
-  stepIndicators.forEach((item) => {
-    const itemStep = parseInt(item.dataset.step, 10);
-    item.classList.remove('is-active', 'is-completed');
-    if (itemStep === currentStep) {
-      item.classList.add('is-active');
-      item.setAttribute('aria-current', 'step');
-    } else if (itemStep < currentStep) {
-      item.classList.add('is-completed');
-      item.removeAttribute('aria-current');
-    } else {
-      item.removeAttribute('aria-current');
-    }
-  });
-
-  if (currentStep === 3) {
-    updateSummaryStrip();
+  const stepStatusEl = document.getElementById('concierge-step-status');
+  if (stepStatusEl) {
+    stepStatusEl.textContent = currentStep === 1
+      ? 'Step 1 of 2 — Shape Your Day'
+      : 'Step 2 of 2 — Where to Send Your Quote';
   }
 
-  // Smooth scroll to top of wizard container on step change
-  const wizardEl = document.querySelector('.booking-card');
-  if (wizardEl) {
-    const top = wizardEl.getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  document.querySelectorAll('.concierge-step-panel').forEach((panel) => {
+    const panelStep = parseInt(panel.dataset.step, 10);
+    panel.classList.toggle('is-active', panelStep === currentStep);
+  });
+
+  if (currentStep === 2) {
+    syncSummaryDisplays();
+  }
+
+  const workspaceEl = document.querySelector('.concierge-workspace');
+  if (workspaceEl) {
+    const top = workspaceEl.getBoundingClientRect().top + window.scrollY;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (window.innerWidth < 960) {
+      window.scrollTo({ top: Math.max(0, top - 12), behavior: prefersReduced ? 'auto' : 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+    }
   }
 }
 
 //------------------------------------------------------------------------------------//
 /**
- * Renders the compact summary strip at the top of Step 3 echoing traveler choices.
+ * Renders the 9 visual 16:10 destination tiles from STOPS with zero pre-selected.
  * @returns {void}
  */
-function updateSummaryStrip() {
-  const summaryEl = document.getElementById('step3-summary-text');
-  if (!summaryEl) return;
+function renderDestinationTiles() {
+  const gridEl = document.getElementById('dest-tiles-grid');
+  if (!gridEl) return;
 
-  const placesList = wizardData.destinations.length > 0
-    ? wizardData.destinations.join(', ')
-    : 'Custom Suggested Route';
+  gridEl.innerHTML = STOPS.map((stop) => {
+    const imgSrc = encodeURI(`${ASSET_BASE_URL}${stop.thumbnailFrame}`);
+    return `
+      <button
+        type="button"
+        class="dest-tile"
+        data-name="${stop.name}"
+        aria-pressed="false"
+      >
+        <img src="${imgSrc}" alt="${stop.name}" class="dest-tile-img" loading="lazy">
+        <span class="dest-tile-scrim" aria-hidden="true"></span>
+        <span class="dest-tile-check" aria-hidden="true">
+          ${getIconMarkup('check-circle', 'icon-sm')}
+        </span>
+        <span class="dest-tile-name">${stop.name}</span>
+      </button>
+    `;
+  }).join('');
 
-  summaryEl.textContent = `${wizardData.duration} · ${wizardData.groupSize} · ${placesList}`;
+  const tiles = Array.from(gridEl.querySelectorAll('.dest-tile'));
+  const suggestBtn = document.getElementById('route-suggest-toggle');
+
+  tiles.forEach((tile) => {
+    tile.addEventListener('click', () => {
+      const nextPressed = tile.getAttribute('aria-pressed') !== 'true';
+      tile.setAttribute('aria-pressed', String(nextPressed));
+      tile.classList.toggle('is-selected', nextPressed);
+
+      if (nextPressed && suggestBtn && conciergeState.suggestRoute) {
+        conciergeState.suggestRoute = false;
+        suggestBtn.setAttribute('aria-pressed', 'false');
+        suggestBtn.classList.remove('is-selected');
+      }
+
+      conciergeState.destinations = tiles
+        .filter((btn) => btn.getAttribute('aria-pressed') === 'true')
+        .map((btn) => btn.dataset.name);
+
+      syncSummaryDisplays();
+    });
+  });
+
+  if (suggestBtn) {
+    suggestBtn.addEventListener('click', () => {
+      const nextPressed = suggestBtn.getAttribute('aria-pressed') !== 'true';
+      conciergeState.suggestRoute = nextPressed;
+      suggestBtn.setAttribute('aria-pressed', String(nextPressed));
+      suggestBtn.classList.toggle('is-selected', nextPressed);
+
+      if (nextPressed) {
+        tiles.forEach((tile) => {
+          tile.setAttribute('aria-pressed', 'false');
+          tile.classList.remove('is-selected');
+        });
+        conciergeState.destinations = [];
+      }
+
+      syncSummaryDisplays();
+    });
+  }
 }
 
 //------------------------------------------------------------------------------------//
 /**
- * Binds destination pills, segmented buttons, step navigation, and form submission.
+ * Binds accessible radiogroup behavior (click + arrow keys) to flat typographic toggles.
+ * @param {string} groupName - Data-group attribute ('duration' or 'group-size').
+ * @param {Function} onChange - Callback invoked with the newly selected value.
+ * @returns {void}
+ */
+function bindOptionGroup(groupName, onChange) {
+  const buttons = Array.from(document.querySelectorAll(`.concierge-option-btn[data-group="${groupName}"]`));
+  if (!buttons.length) return;
+
+  function activateButton(targetBtn) {
+    buttons.forEach((btn) => {
+      const isSelected = btn === targetBtn;
+      btn.classList.toggle('is-active', isSelected);
+      btn.setAttribute('aria-checked', String(isSelected));
+      btn.setAttribute('tabindex', isSelected ? '0' : '-1');
+    });
+    const val = targetBtn.dataset.val || targetBtn.textContent.trim();
+    onChange(val);
+    syncSummaryDisplays();
+  }
+
+  buttons.forEach((btn, idx) => {
+    btn.addEventListener('click', () => activateButton(btn));
+    btn.addEventListener('keydown', (e) => {
+      let nextIdx = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextIdx = (idx + 1) % buttons.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        nextIdx = (idx - 1 + buttons.length) % buttons.length;
+      }
+      if (nextIdx !== null) {
+        e.preventDefault();
+        activateButton(buttons[nextIdx]);
+        buttons[nextIdx].focus();
+      }
+    });
+  });
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Validates Step 2 required traveler fields (Full Name and Email Address).
+ * @param {HTMLInputElement|null} nameInput - Full name input element.
+ * @param {HTMLInputElement|null} emailInput - Email address input element.
+ * @returns {{ valid: boolean, message: string, firstInvalid: HTMLElement|null }} Validation state.
+ */
+function validateContactFields(nameInput, emailInput) {
+  const name = nameInput ? nameInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim() : '';
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const nameValid = name.length > 0;
+  const emailValid = email.length > 0 && emailPattern.test(email);
+
+  if (nameInput) {
+    nameInput.classList.toggle('is-invalid', !nameValid);
+    nameInput.setAttribute('aria-invalid', String(!nameValid));
+  }
+  if (emailInput) {
+    emailInput.classList.toggle('is-invalid', !emailValid);
+    emailInput.setAttribute('aria-invalid', String(!emailValid));
+  }
+
+  if (!nameValid && !emailValid) {
+    return {
+      valid: false,
+      message: 'Please enter your name and a valid email address so I can reply with your route and quote.',
+      firstInvalid: nameInput
+    };
+  }
+  if (!nameValid) {
+    return {
+      valid: false,
+      message: 'Please enter your name so I know how to address your reply.',
+      firstInvalid: nameInput
+    };
+  }
+  if (!emailValid) {
+    return {
+      valid: false,
+      message: 'Please enter a valid email address (for example, name@example.com).',
+      firstInvalid: emailInput
+    };
+  }
+
+  return { valid: true, message: '', firstInvalid: null };
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Initializes the 2-step Split-Screen Visual Concierge workflow and form submission.
  * @returns {void}
  */
 export function initBookingWizard() {
-  const pillInputs = document.querySelectorAll('.dest-pill-input');
-  pillInputs.forEach((input) => {
-    input.addEventListener('change', () => {
-      const parentPill = input.closest('.dest-pill');
-      if (parentPill) {
-        parentPill.classList.toggle('is-active', input.checked);
-      }
+  renderDestinationTiles();
+  syncSummaryDisplays();
 
-      // Handle "Not sure yet — suggest a route for me" mutual exclusion
-      if (input.value === 'suggest-route' && input.checked) {
-        pillInputs.forEach((other) => {
-          if (other !== input && other.checked) {
-            other.checked = false;
-            const otherPill = other.closest('.dest-pill');
-            if (otherPill) otherPill.classList.remove('is-active');
-          }
-        });
-      } else if (input.checked) {
-        const suggestInput = document.querySelector('.dest-pill-input[value="suggest-route"]');
-        if (suggestInput && suggestInput.checked) {
-          suggestInput.checked = false;
-          const suggestPill = suggestInput.closest('.dest-pill');
-          if (suggestPill) suggestPill.classList.remove('is-active');
-        }
-      }
-
-      // Sync data
-      const selected = Array.from(pillInputs)
-        .filter((i) => i.checked)
-        .map((i) => {
-          const pill = i.closest('.dest-pill');
-          return pill ? pill.dataset.name || i.value : i.value;
-        });
-      wizardData.destinations = selected;
-    });
+  bindOptionGroup('duration', (val) => {
+    conciergeState.duration = val;
   });
 
-  // Step 2 Segmented Buttons: Duration
-  const durationBtns = document.querySelectorAll('.segment-btn[data-group="duration"]');
-  durationBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      durationBtns.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      wizardData.duration = btn.dataset.val || btn.textContent.trim();
-    });
+  bindOptionGroup('group-size', (val) => {
+    conciergeState.groupSize = val;
   });
 
-  // Step 2 Segmented Buttons: Group Size
-  const groupBtns = document.querySelectorAll('.segment-btn[data-group="group-size"]');
-  groupBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      groupBtns.forEach((b) => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      wizardData.groupSize = btn.dataset.val || btn.textContent.trim();
-    });
-  });
+  const nextBtn = document.getElementById('btn-next-step-2');
+  if (nextBtn) nextBtn.addEventListener('click', () => goToStep(2));
 
-  // Dates & Notes Inputs
+  const backBtn = document.getElementById('btn-back-step-1');
+  if (backBtn) backBtn.addEventListener('click', () => goToStep(1));
+
+  const changeBtn = document.getElementById('btn-change-step-1');
+  if (changeBtn) changeBtn.addEventListener('click', () => goToStep(1));
+
   const datesInput = document.getElementById('inquiry-dates');
   if (datesInput) {
     datesInput.addEventListener('input', () => {
-      wizardData.dates = datesInput.value.trim();
+      conciergeState.dates = datesInput.value.trim();
     });
   }
 
   const notesInput = document.getElementById('inquiry-notes');
   if (notesInput) {
     notesInput.addEventListener('input', () => {
-      wizardData.notes = notesInput.value.trim();
+      conciergeState.notes = notesInput.value.trim();
     });
   }
 
-  // Next / Back Buttons
-  const nextToStep2 = document.getElementById('btn-next-step-2');
-  if (nextToStep2) {
-    nextToStep2.addEventListener('click', () => goToStep(2));
-  }
-
-  const backToStep1 = document.getElementById('btn-back-step-1');
-  if (backToStep1) {
-    backToStep1.addEventListener('click', () => goToStep(1));
-  }
-
-  const nextToStep3 = document.getElementById('btn-next-step-3');
-  if (nextToStep3) {
-    nextToStep3.addEventListener('click', () => goToStep(3));
-  }
-
-  const backToStep2 = document.getElementById('btn-back-step-2');
-  if (backToStep2) {
-    backToStep2.addEventListener('click', () => goToStep(2));
-  }
-
-  const editFromStep3 = document.getElementById('btn-edit-summary');
-  if (editFromStep3) {
-    editFromStep3.addEventListener('click', (e) => {
-      e.preventDefault();
-      goToStep(1);
-    });
-  }
-
-  // Clickable Header Step Indicators
-  const stepIndicators = document.querySelectorAll('.step-indicator-item');
-  stepIndicators.forEach((item) => {
-    item.addEventListener('click', () => {
-      const targetStep = parseInt(item.dataset.step, 10);
-      if (targetStep < currentStep || item.classList.contains('is-completed')) {
-        goToStep(targetStep);
-      }
-    });
-  });
-
-  // Final Submission
-  const wizardForm = document.getElementById('booking-inquiry-form');
+  const inquiryForm = document.getElementById('booking-inquiry-form');
   const statusEl = document.getElementById('booking-form-status');
+  const stepStatusEl = document.getElementById('concierge-step-status');
   const confirmationCard = document.getElementById('booking-confirmation');
   const confirmationName = document.getElementById('confirmation-traveler-name');
   const confirmationSummary = document.getElementById('confirmation-summary-details');
 
-  if (wizardForm) {
-    wizardForm.addEventListener('submit', (e) => {
+  if (inquiryForm) {
+    const nameInput = document.getElementById('inquiry-name');
+    const emailInput = document.getElementById('inquiry-email');
+
+    [nameInput, emailInput].forEach((field) => {
+      if (!field) return;
+      field.addEventListener('input', () => {
+        field.classList.remove('is-invalid');
+        field.removeAttribute('aria-invalid');
+      });
+    });
+
+    inquiryForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const nameInput = document.getElementById('inquiry-name');
-      const emailInput = document.getElementById('inquiry-email');
       const phoneInput = document.getElementById('inquiry-phone');
       const countryInput = document.getElementById('inquiry-country');
 
-      const name = nameInput ? nameInput.value.trim() : '';
-      const email = emailInput ? emailInput.value.trim() : '';
-      const phone = phoneInput ? phoneInput.value.trim() : '';
-      const country = countryInput ? countryInput.value.trim() : '';
-
-      if (!name || !email) {
+      const validation = validateContactFields(nameInput, emailInput);
+      if (!validation.valid) {
         if (statusEl) {
-          statusEl.textContent = 'Please enter your name and email address so I can send your quote.';
+          statusEl.textContent = validation.message;
           statusEl.className = 'form-status is-error';
+        }
+        if (validation.firstInvalid) {
+          validation.firstInvalid.focus();
         }
         return;
       }
 
-      wizardData.name = name;
-      wizardData.email = email;
-      wizardData.phone = phone;
-      wizardData.country = country;
+      conciergeState.name = nameInput ? nameInput.value.trim() : '';
+      conciergeState.email = emailInput ? emailInput.value.trim() : '';
+      conciergeState.phone = phoneInput ? phoneInput.value.trim() : '';
+      conciergeState.country = countryInput ? countryInput.value.trim() : '';
 
-      // Save inquiry to localStorage
       try {
         const storedInquiries = JSON.parse(localStorage.getItem('cape_private_tours_inquiries') || '[]');
         storedInquiries.push({
-          ...wizardData,
+          ...conciergeState,
           timestamp: new Date().toISOString()
         });
         localStorage.setItem('cape_private_tours_inquiries', JSON.stringify(storedInquiries));
       } catch (err) {
-        console.warn('[Booking] Could not persist inquiry:', err);
+        console.warn('[Concierge] Could not persist inquiry:', err);
       }
 
       if (confirmationName) {
-        confirmationName.textContent = name;
+        confirmationName.textContent = conciergeState.name;
       }
 
       if (confirmationSummary) {
-        const placesText = wizardData.destinations.length > 0
-          ? wizardData.destinations.join(', ')
-          : 'Custom Suggested Route';
-        const dateText = wizardData.dates ? ` · ${wizardData.dates}` : '';
-        confirmationSummary.textContent = `${wizardData.duration} · ${wizardData.groupSize}${dateText} · ${placesText}`;
+        const dateSegment = conciergeState.dates ? ` · ${conciergeState.dates}` : '';
+        confirmationSummary.textContent = `${conciergeState.duration} · ${conciergeState.groupSize}${dateSegment} · ${formatPlacesSummary()}`;
       }
 
-      // Hide wizard card and show confirmation in place
-      const wizardBody = document.getElementById('wizard-body');
-      if (wizardBody) wizardBody.style.display = 'none';
-      if (confirmationCard) confirmationCard.classList.remove('is-hidden');
+      document.querySelectorAll('.concierge-step-panel').forEach((panel) => {
+        panel.classList.remove('is-active');
+      });
+      if (stepStatusEl) {
+        stepStatusEl.textContent = 'Inquiry Received';
+      }
+      if (confirmationCard) {
+        confirmationCard.classList.remove('is-hidden');
+      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });

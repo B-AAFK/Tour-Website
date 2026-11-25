@@ -1,8 +1,9 @@
 // =============================================================================
-// Cape Town Tour Guide — Frame Asset Loader & Non-Blocking Preloader
+// Cape Private Tours — Frame Asset Loader & Non-Blocking Preloader
 // =============================================================================
 
 import {
+  ASSET_BASE_URL,
   PARTS,
   FRAME_STEP,
   INITIAL_LOAD_TARGET,
@@ -28,7 +29,7 @@ export function buildFrameRegistry() {
   for (const part of PARTS) {
     for (let frameNum = 1; frameNum <= part.frameCount; frameNum += FRAME_STEP) {
       const paddedNum = String(frameNum).padStart(3, '0');
-      const url = `${part.folder}/ezgif-frame-${paddedNum}.webp`;
+      const url = `${ASSET_BASE_URL}${part.folder}/ezgif-frame-${paddedNum}.webp`;
 
       frameRegistry.push({
         index: sequentialIndex,
@@ -59,19 +60,16 @@ export function getNearestLoadedFrame(targetIndex) {
 
   const boundedIndex = Math.max(0, Math.min(frameRegistry.length - 1, targetIndex));
 
-  // Direct hit if already cached
   if (frameRegistry[boundedIndex] && frameRegistry[boundedIndex].loaded) {
     return frameRegistry[boundedIndex];
   }
 
-  // Search backward toward start
   for (let i = boundedIndex - 1; i >= 0; i--) {
     if (frameRegistry[i] && frameRegistry[i].loaded) {
       return frameRegistry[i];
     }
   }
 
-  // Search forward toward end
   for (let i = boundedIndex + 1; i < frameRegistry.length; i++) {
     if (frameRegistry[i] && frameRegistry[i].loaded) {
       return frameRegistry[i];

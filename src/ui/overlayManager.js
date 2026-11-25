@@ -1,14 +1,17 @@
 // =============================================================================
-// Cape Private Tours — Destination Overlay & Travelogue Caption Manager
+// Cape Private Tours — Destination Overlay & Chapter Scrubber Manager
 // =============================================================================
 
-import { getStopByFrame } from '../config/tourConfig.js';
+import { STOPS, getStopByFrame } from '../config/tourConfig.js';
+import { getIconMarkup } from './icons.js';
 
 let captionBarEl = null;
 let captionNameEl = null;
 let captionRegionEl = null;
 let captionProgressFillEl = null;
+let chapterScrubberEl = null;
 let activeStopId = null;
+let chapterButtons = [];
 
 //------------------------------------------------------------------------------------//
 /**
@@ -22,7 +25,69 @@ export function getActiveStop(frameIndex) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Updates caption state and progress bar in the pinned Cinema Frame showcase.
+ * Finds the nearest stop at or before the current frame for regional accent continuity.
+ * @param {number} frameIndex - Current rendered frame index (0-449).
+ * @returns {Object} Nearest tour stop object.
+ */
+function getContextualStop(frameIndex) {
+  const direct = getStopByFrame(frameIndex);
+  if (direct) return direct;
+
+  let fallback = STOPS[0];
+  for (const stop of STOPS) {
+    if (frameIndex >= stop.startFrame) {
+      fallback = stop;
+    }
+  }
+  return fallback;
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Renders the interactive 9-stop horizontal chapter scrubber beneath the progress bar.
+ * @param {Function} [onSelectStop] - Callback invoked with target startFrame when clicked.
+ * @returns {void}
+ */
+function renderChapterScrubber(onSelectStop) {
+  if (!chapterScrubberEl) return;
+
+  chapterScrubberEl.innerHTML = STOPS.map((stop) => {
+    const shortName = stop.name
+      .replace(' Nature Reserve', '')
+      .replace(' Gardens', '')
+      .replace(' Winelands', '')
+      .replace('Cape of Good Hope', 'Good Hope');
+
+    return `
+      <button
+        type="button"
+        class="chapter-marker"
+        data-stop-id="${stop.id}"
+        data-start-frame="${stop.startFrame}"
+        style="--chapter-color: ${stop.regionColorToken}"
+        aria-label="Jump to ${stop.name} (${stop.region})"
+        title="${stop.name}"
+      >
+        <span class="chapter-marker-dot" aria-hidden="true"></span>
+        <span class="chapter-marker-label">${shortName}</span>
+      </button>
+    `;
+  }).join('');
+
+  chapterButtons = Array.from(chapterScrubberEl.querySelectorAll('.chapter-marker'));
+  chapterButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const startFrame = parseInt(btn.dataset.startFrame, 10);
+      if (!Number.isNaN(startFrame) && typeof onSelectStop === 'function') {
+        onSelectStop(startFrame);
+      }
+    });
+  });
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Updates caption state, regional color bar, and chapter scrubber in the Cinema Frame showcase.
  * @param {number} currentFrame - Active frame index (0-449).
  * @param {number} progress - Normalized scroll progress (0.0 - 1.0).
  * @param {boolean} [force=false] - Force update of elements regardless of cached active ID.
@@ -30,6 +95,7 @@ export function getActiveStop(frameIndex) {
  */
 export function updateOverlays(currentFrame, progress, force = false) {
   const matchingStop = getActiveStop(currentFrame);
+  const contextualStop = matchingStop || getContextualStop(currentFrame);
   const newActiveId = matchingStop ? matchingStop.id : null;
 
   if (force || newActiveId !== activeStopId) {
@@ -39,32 +105,47 @@ export function updateOverlays(currentFrame, progress, force = false) {
       if (matchingStop) {
         captionNameEl.textContent = matchingStop.name;
         if (captionRegionEl) {
-          captionRegionEl.textContent = matchingStop.region;
+          captionRegionEl.innerHTML = `${getIconMarkup('location', 'icon-sm')}<span>${matchingStop.region}</span>`;
         }
+        captionBarEl.style.setProperty('--active-region-color', matchingStop.regionColorToken);
         captionBarEl.classList.add('is-visible');
       } else {
         captionBarEl.classList.remove('is-visible');
       }
     }
+
+    chapterButtons.forEach((btn) => {
+      const stopId = parseInt(btn.dataset.stopId, 10);
+      const isCurrent = stopId === newActiveId;
+      btn.classList.toggle('is-active', isCurrent);
+      if (isCurrent) {
+        btn.setAttribute('aria-current', 'true');
+      } else {
+        btn.removeAttribute('aria-current');
+      }
+    });
   }
 
-  // Update thin terracotta progress bar
   if (captionProgressFillEl) {
     captionProgressFillEl.style.width = `${(progress * 100).toFixed(2)}%`;
+    captionProgressFillEl.style.backgroundColor = contextualStop.regionColorToken;
   }
 }
 
 //------------------------------------------------------------------------------------//
 /**
- * Initializes destination caption bindings and caches DOM nodes.
+ * Initializes destination caption bindings, chapter scrubber, and caches DOM nodes.
+ * @param {Function} [onSelectStop] - Optional callback invoked with frame index on chapter click.
  * @returns {void}
  */
-export function initOverlayManager() {
+export function initOverlayManager(onSelectStop) {
   captionBarEl = document.getElementById('travelogue-caption-bar');
   captionNameEl = document.getElementById('caption-name');
   captionRegionEl = document.getElementById('caption-region');
   captionProgressFillEl = document.getElementById('caption-progress-fill');
+  chapterScrubberEl = document.getElementById('chapter-scrubber');
 
+  renderChapterScrubber(onSelectStop);
   activeStopId = null;
   updateOverlays(0, 0, true);
 }

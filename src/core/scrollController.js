@@ -112,6 +112,26 @@ export function initScrollController(totalFrames = TOTAL_FRAMES, onFrameTick = n
 
 //------------------------------------------------------------------------------------//
 /**
+ * Smoothly scrolls the page to the pinned timeline position matching a target frame index.
+ * @param {number} targetFrame - Desired sequence frame index (0-449).
+ * @returns {void}
+ */
+export function scrollToFrame(targetFrame) {
+  if (!masterTimeline || !masterTimeline.scrollTrigger) return;
+  const st = masterTimeline.scrollTrigger;
+  const clamped = Math.max(0, Math.min(TOTAL_FRAMES - 1, targetFrame));
+  const targetProgress = clamped / (TOTAL_FRAMES - 1);
+  const targetScrollY = st.start + targetProgress * (st.end - st.start);
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  window.scrollTo({
+    top: targetScrollY,
+    behavior: prefersReduced ? 'auto' : 'smooth'
+  });
+}
+
+//------------------------------------------------------------------------------------//
+/**
  * Triggers a manual ScrollTrigger layout refresh calculation.
  * @returns {void}
  */

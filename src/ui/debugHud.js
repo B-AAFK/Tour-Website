@@ -1,5 +1,5 @@
 // =============================================================================
-// Cape Town Tour Guide — Sequence Debug HUD ('D' Key Toggle)
+// Cape Private Tours — Sequence Debug HUD ('D' Key Toggle)
 // =============================================================================
 
 import { getStopByFrame } from '../config/tourConfig.js';
@@ -33,7 +33,7 @@ export function updateDebugHud() {
     ? `[${currentStop.region}] ${currentStop.name} (f:${currentStop.startFrame}-${currentStop.endFrame})`
     : '[TRANSITION DEAD-ZONE]';
 
-  const modeLabel = mode === 'option-a' ? 'Option A (Split-Screen)' : 'Option B (Travelogue Pinned)';
+  const modeLabel = mode === 'cinema-frame' ? 'Cinema Frame (Pinned)' : mode;
   const pctLoaded = stats.total > 0 ? Math.floor((stats.loaded / stats.total) * 100) : 0;
 
   hudElement.innerHTML = `
@@ -42,12 +42,12 @@ export function updateDebugHud() {
       <span class="hud-key-tag">KEY: [D]</span>
     </div>
     <div class="hud-grid">
-      <div class="hud-row"><span class="hud-label">FRAME INDEX:</span><span class="hud-value">${String(currentFrame).padStart(3, '0')} / 449</span></div>
-      <div class="hud-row"><span class="hud-label">ACTIVE STOP:</span><span class="hud-value hud-accent">${stopText}</span></div>
-      <div class="hud-row"><span class="hud-label">LAYOUT MODE:</span><span class="hud-value">${modeLabel}</span></div>
-      <div class="hud-row"><span class="hud-label">SCROLL PROGRESS:</span><span class="hud-value">${(progress * 100).toFixed(1)}%</span></div>
-      <div class="hud-row"><span class="hud-label">ASSET BUFFER:</span><span class="hud-value">${stats.loaded} / ${stats.total} (${pctLoaded}%)</span></div>
-      <div class="hud-row"><span class="hud-label">CANVAS BUFFER:</span><span class="hud-value">${cw}x${ch} (DPR: ${dpr})</span></div>
+      <div class="hud-row"><span class="hud-label">FRAME INDEX:</span><span class="hud-val">${String(currentFrame).padStart(3, '0')} / 449</span></div>
+      <div class="hud-row"><span class="hud-label">ACTIVE STOP:</span><span class="hud-val hud-accent">${stopText}</span></div>
+      <div class="hud-row"><span class="hud-label">LAYOUT MODE:</span><span class="hud-val">${modeLabel}</span></div>
+      <div class="hud-row"><span class="hud-label">SCROLL PROGRESS:</span><span class="hud-val">${(progress * 100).toFixed(1)}%</span></div>
+      <div class="hud-row"><span class="hud-label">ASSET BUFFER:</span><span class="hud-val">${stats.loaded} / ${stats.total} (${pctLoaded}%)</span></div>
+      <div class="hud-row"><span class="hud-label">CANVAS BUFFER:</span><span class="hud-val">${cw}x${ch} (DPR: ${dpr})</span></div>
     </div>
   `;
 }
@@ -62,10 +62,10 @@ export function toggleDebugHud() {
   if (!hudElement) return;
 
   if (isHudVisible) {
-    hudElement.classList.add('is-active');
+    hudElement.classList.add('is-visible');
     updateDebugHud();
   } else {
-    hudElement.classList.remove('is-active');
+    hudElement.classList.remove('is-visible');
   }
 }
 
@@ -78,7 +78,6 @@ export function initDebugHud() {
   hudElement = document.getElementById('debug-hud');
 
   window.addEventListener('keydown', (e) => {
-    // Avoid triggering when user is typing in form inputs or textareas
     const activeTagName = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
     if (activeTagName === 'input' || activeTagName === 'textarea' || activeTagName === 'select') {
       return;

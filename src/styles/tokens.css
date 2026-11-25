@@ -1,91 +1,70 @@
 /* =============================================================================
    Cape Private Tours — Design Tokens & CSS Custom Properties
-   Crisp Coastal Palette & Gallery-Neutral Aesthetic
+   Gallery-Neutral Canvas & Vibrant South African Accent System
    ============================================================================= */
 
 :root {
-  /* Surfaces & Backgrounds */
-  --color-bg-white: #FFFFFF;
-  --color-bg-sand: #F3F4F6;
-  --color-bg-fynbos: #11171A;
-  --color-bg-fynbos-light: #1A2226;
-  --color-surface-card: #FFFFFF;
-  --color-surface-card-hover: #F8F9FA;
-  --color-surface-input: #F3F4F6;
+  /* Core Surfaces & Ink (85% of Visual Weight) */
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F4F5F7;
+  --surface-dark: #0E1719;
+  --surface-dark-elevated: #172427;
 
-  /* Natural Photo Scrim Gradients (Lightened top for sky visibility, grounded bottom) */
-  --color-scrim-top: rgba(17, 23, 26, 0.40);
-  --color-scrim-clear: rgba(17, 23, 26, 0);
-  --color-scrim-bottom: rgba(17, 23, 26, 0.90);
+  --ink-primary: #121619;
+  --ink-secondary: #4A5359;
+  --ink-muted: #646E75;
+  --ink-on-dark: #F7F9FA;
+  --ink-on-dark-muted: #B6C2C7;
 
-  /* Primary & Secondary Typography */
-  --color-text-charcoal: #14171A;
-  --color-text-muted: #4E565C;
-  --color-text-light: #6B747B;
-  --color-text-white: #FFFFFF;
-  --color-text-white-90: rgba(255, 255, 255, 0.9);
-  --color-text-white-85: rgba(255, 255, 255, 0.85);
-  --color-text-white-80: rgba(255, 255, 255, 0.8);
-  --color-text-fynbos: #11171A;
+  --border-subtle: #E1E5E9;
+  --border-input: #C4CCD4;
+  --border-dark: #26373B;
 
-  /* Accents & CTA Colors (Deep Coastal Slate + Sun-Baked Ochre) */
-  --color-accent-terracotta: #162B30;
-  --color-accent-terracotta-hover: #0F1F23;
-  --color-accent-terracotta-active: #0A1619;
-  --color-accent-ochre: #B85D2A;
-  --color-accent-slate: #162B30;
-  --color-accent-slate-hover: #0F1F23;
+  /* Vibrant South African Accents (15% of Visual Weight) */
+  --accent-primary: #D6492A;
+  --accent-primary-accessible: #C23C1E;
+  --accent-primary-hover: #B83A1E;
+  --accent-ink: #0F2D33;
+  --accent-ink-hover: #0A2024;
+  --accent-sun: #E09F1F;
 
-  /* Inverted Button on Dark Bands (Hero & Closing Band) */
-  --color-btn-darkband-bg: #FFFFFF;
-  --color-btn-darkband-text: #14171A;
-  --color-btn-darkband-border: #FFFFFF;
-  --color-btn-darkband-hover-bg: #F3F4F6;
+  /* Regional Color Keys (Dynamic Showcase & Destination Identity) */
+  --region-city: #D6492A;
+  --region-atlantic: #176087;
+  --region-peninsula: #0E7C7B;
+  --region-flora: #1E7A56;
+  --region-winelands: #8C2743;
 
-  /* Borders & Hairlines */
-  --color-border-sand: #E2E6EA;
-  --color-border-sand-light: #E2E6EA;
-  --color-border-sand-dark: #CCD2D8;
-  --color-border-fynbos: #222C30;
-  --color-border-fynbos-light: #2A363B;
-  --color-border-terracotta: #162B30;
+  /* Natural Photo Scrim Gradients (Light top for sky visibility, grounded lower-left) */
+  --scrim-top: rgba(14, 23, 25, 0.34);
+  --scrim-clear: rgba(14, 23, 25, 0);
+  --scrim-bottom: rgba(14, 23, 25, 0.90);
+  --scrim-tile-bottom: rgba(14, 23, 25, 0.88);
 
-  /* Form Inputs & Textareas */
-  --color-input-bg: #F3F4F6;
-  --color-input-border: #CCD2D8;
-  --color-input-focus: #162B30;
+  /* Progress, States & Feedback */
+  --progress-track: rgba(247, 249, 250, 0.22);
+  --progress-fill-default: #D6492A;
+  --status-success: #1E7A56;
+  --status-error: #B83A1E;
 
-  /* Wizard & Segmented Controls */
-  --color-pill-bg: #FFFFFF;
-  --color-pill-text: #14171A;
-  --color-pill-border: #CCD2D8;
-  --color-pill-active-bg: #162B30;
-  --color-pill-active-text: #FFFFFF;
-  --color-pill-active-border: #162B30;
+  /* Inverted Controls on Dark Bands */
+  --btn-on-dark-bg: #FFFFFF;
+  --btn-on-dark-text: #121619;
+  --btn-on-dark-hover-bg: #F4F5F7;
 
-  --color-segment-bg: #E2E6EA;
-  --color-segment-text: #4E565C;
-  --color-segment-active-bg: #162B30;
-  --color-segment-active-text: #FFFFFF;
-
-  /* Progress & Indicators */
-  --color-progress-track: rgba(255, 255, 255, 0.22);
-  --color-progress-fill: #B85D2A;
-  --color-step-active: #B85D2A;
-  --color-step-inactive: #6B747B;
-  --color-step-done: #162B30;
-
-  /* HUD */
-  --color-hud-bg: #11171A;
-  --color-hud-text: #FFFFFF;
-  --color-hud-border: #2A363B;
-  --color-hud-accent: #B85D2A;
-  --color-hud-muted: #CCD2D8;
+  /* Tactile Hard-Offset Borders & Focus Rings (Zero Blur Shadows) */
+  --shadow-offset-sm: 2px 2px 0 var(--ink-primary);
+  --shadow-offset: 3px 3px 0 var(--ink-primary);
+  --shadow-offset-dark: 3px 3px 0 var(--accent-sun);
+  --focus-ring: 2px solid var(--accent-primary);
 
   /* Typography Stacks (Local System Fonts Only) */
-  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  /* Motion Timing */
+  --transition-fast: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Z-Index Hierarchy */
   --z-base: 1;
