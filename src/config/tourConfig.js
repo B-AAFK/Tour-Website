@@ -15,7 +15,10 @@ export const TOTAL_FRAMES = 450;             // Total frame count in sequence
 export const SCROLL_DISTANCE = 12000;        // Full virtual track reference distance
 export const OPTION_B_SCROLL_DISTANCE = 3800; // Pinned Cinema Frame scroll distance in pixels
 export const INITIAL_LOAD_TARGET = 40;       // Initial buffer count before unlocking scrub timeline
-export const BACKGROUND_CONCURRENCY = 8;     // Concurrent background frame download workers
+export const BACKGROUND_CONCURRENCY = 6;     // Bounded concurrent frame download workers
+
+export const DURATION_OPTIONS = ['Half Day (4–5 hrs)', 'Full Day (8 hrs)', 'Multi-Day'];
+export const GROUP_SIZE_OPTIONS = ['1–2 Guests', '3–4 Guests', '5–6 Guests', '7+ Guests'];
 
 export const STOPS = [
   {
@@ -26,7 +29,7 @@ export const STOPS = [
     name: 'Bo-Kaap',
     startFrame: 0,
     endFrame: 22,
-    thumbnailFrame: '/images/Bo-Kaap.jpg',
+    thumbnailFrame: '/images/Bo-Kaap.webp',
     description: 'Cobbled lanes and pastel Cape Malay houses, visited in the quiet morning for fresh koesisters and local spice kitchens.'
   },
   {
@@ -37,7 +40,7 @@ export const STOPS = [
     name: "Lion's Head",
     startFrame: 34,
     endFrame: 71,
-    thumbnailFrame: '/images/Lions head.jpg',
+    thumbnailFrame: '/images/Lions head.webp',
     description: 'Panoramic coastal ridge between the city bowl and the Atlantic ocean swell, offering golden-hour lookouts across the bay.'
   },
   {
@@ -48,7 +51,7 @@ export const STOPS = [
     name: 'Table Mountain',
     startFrame: 90,
     endFrame: 126,
-    thumbnailFrame: '/images/Table Mountain.jpg',
+    thumbnailFrame: '/images/Table Mountain.webp',
     description: 'Ancient sandstone plateau towering over the ocean. We follow the wind and clouds to summit when visibility is at its clearest.'
   },
   {
@@ -59,7 +62,7 @@ export const STOPS = [
     name: 'Boulders Beach',
     startFrame: 156,
     endFrame: 198,
-    thumbnailFrame: '/images/Boulders Beach.jpg',
+    thumbnailFrame: '/images/Boulders Beach.webp',
     description: 'Sheltered granite cove in Simons Town home to free-roaming African penguins along quiet coastal crevices.'
   },
   {
@@ -70,7 +73,7 @@ export const STOPS = [
     name: 'Cape of Good Hope',
     startFrame: 218,
     endFrame: 263,
-    thumbnailFrame: '/images/Cape of Good Hope.jpeg',
+    thumbnailFrame: '/images/Cape of Good Hope.webp',
     description: 'Dramatic promontory where wild ocean swells crash into sheer sea-cliffs at the southwestern tip of the continent.'
   },
   {
@@ -92,7 +95,7 @@ export const STOPS = [
     name: 'Kirstenbosch Gardens',
     startFrame: 318,
     endFrame: 363,
-    thumbnailFrame: '/images/Kirstenbosch.jpg',
+    thumbnailFrame: '/images/Kirstenbosch.webp',
     description: 'World-renowned botanical gardens nestled along Table Mountains eastern slopes, celebrating indigenous Cape flora.'
   },
   {
@@ -103,7 +106,7 @@ export const STOPS = [
     name: 'Groot Constantia',
     startFrame: 378,
     endFrame: 422,
-    thumbnailFrame: '/images/Groot Constantia.jpg',
+    thumbnailFrame: '/images/Groot Constantia.webp',
     description: 'South Africas oldest wine estate dating to 1685, showcasing Cape Dutch manor architecture and cellar tastings under heritage oaks.'
   },
   {
@@ -114,7 +117,7 @@ export const STOPS = [
     name: 'Franschhoek Winelands',
     startFrame: 434,
     endFrame: 449,
-    thumbnailFrame: '/images/Franschhoek.jpg',
+    thumbnailFrame: '/images/Franschhoek.webp',
     description: 'Huguenot mountain valley bordered by granite peaks, famed for family-run wine cellars, farm lunches, and quiet vineyard roads.'
   }
 ];

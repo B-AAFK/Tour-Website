@@ -1,5 +1,5 @@
 // =============================================================================
-// Cape Private Tours — Local Icons8 Asset Registry & Helper
+// Cape Private Tours — Local Icons8 Asset Registry & Safe DOM Helper
 // =============================================================================
 
 import arrowDownUrl from '../assets/icons/arrow-down.png';
@@ -64,20 +64,6 @@ export const ICON_URLS = {
 
 //------------------------------------------------------------------------------------//
 /**
- * Returns HTML markup for a local Icons8 monochrome icon tinted via CSS currentColor.
- * @param {string} name - Key from ICON_URLS.
- * @param {string} [extraClass=''] - Additional CSS class names.
- * @returns {string} HTML span markup for the masked icon.
- */
-export function getIconMarkup(name, extraClass = '') {
-  const url = ICON_URLS[name];
-  if (!url) return '';
-  const cls = extraClass ? `icon-glyph ${extraClass}` : 'icon-glyph';
-  return `<span class="${cls}" style="--icon-src: url('${url}')" aria-hidden="true"></span>`;
-}
-
-//------------------------------------------------------------------------------------//
-/**
  * Applies a local Icons8 icon mask URL to an existing DOM element.
  * @param {HTMLElement} el - Target icon container element.
  * @param {string} name - Key from ICON_URLS.
@@ -92,6 +78,38 @@ export function applyIconToElement(el, name) {
   if (!el.hasAttribute('aria-hidden')) {
     el.setAttribute('aria-hidden', 'true');
   }
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Creates a safe DOM element for a local icon without using innerHTML.
+ * @param {string} name - Key from ICON_URLS.
+ * @param {string} [extraClass=''] - Additional CSS class names.
+ * @returns {HTMLSpanElement} Configured icon element.
+ */
+export function createIconElement(name, extraClass = '') {
+  const span = document.createElement('span');
+  if (extraClass) {
+    extraClass.split(/\s+/).filter(Boolean).forEach((cls) => span.classList.add(cls));
+  }
+  applyIconToElement(span, name);
+  return span;
+}
+
+//------------------------------------------------------------------------------------//
+/**
+ * Safely parses an SVG markup string using DOMParser and imports it into the document.
+ * @param {string} svgMarkup - Raw SVG XML string.
+ * @returns {SVGElement|null} Imported SVG element or null if invalid.
+ */
+export function parseSvgElement(svgMarkup) {
+  if (typeof DOMParser === 'undefined' || typeof svgMarkup !== 'string') return null;
+  const parsed = new DOMParser().parseFromString(svgMarkup, 'image/svg+xml');
+  const root = parsed.documentElement;
+  if (!root || root.tagName.toLowerCase() !== 'svg' || parsed.querySelector('parsererror')) {
+    return null;
+  }
+  return document.importNode(root, true);
 }
 
 //------------------------------------------------------------------------------------//

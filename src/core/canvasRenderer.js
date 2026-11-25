@@ -1,5 +1,5 @@
 // =============================================================================
-// Cape Town Tour Guide — DPR-Aware Canvas Renderer (16:9 Framed Math)
+// Cape Private Tours — DPR-Aware Canvas Renderer (16:9 Framed Math)
 // =============================================================================
 
 let canvas = null;
@@ -8,6 +8,7 @@ let getFrameRecord = null;
 let lastRenderedIndex = -1;
 let currentFrameIndex = 0;
 let onResizeCallback = null;
+let resizeRafId = null;
 
 //------------------------------------------------------------------------------------//
 /**
@@ -81,24 +82,37 @@ export function renderFrame(targetIndex, force = false) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Returns the currently active target frame index.
- * @returns {number} Active target frame index.
+ * Coalesces window resize events via requestAnimationFrame to prevent layout thrashing.
+ * @returns {void}
  */
-export function getCurrentFrameIndex() {
-  return currentFrameIndex;
+function handleResize() {
+  if (resizeRafId !== null) return;
+  resizeRafId = requestAnimationFrame(() => {
+    resizeRafId = null;
+    updateCanvasDimensions();
+    renderFrame(currentFrameIndex, true);
+    if (onResizeCallback) {
+      onResizeCallback();
+    }
+  });
 }
 
 //------------------------------------------------------------------------------------//
 /**
- * Handles window resize events: recalibrates canvas dimensions and triggers re-render.
+ * Detaches resize listeners and clears pending animation frame callbacks.
  * @returns {void}
  */
-function handleResize() {
-  updateCanvasDimensions();
-  renderFrame(currentFrameIndex, true);
-  if (onResizeCallback) {
-    onResizeCallback();
+export function destroyCanvasRenderer() {
+  window.removeEventListener('resize', handleResize);
+  if (resizeRafId !== null) {
+    cancelAnimationFrame(resizeRafId);
+    resizeRafId = null;
   }
+  canvas = null;
+  ctx = null;
+  getFrameRecord = null;
+  onResizeCallback = null;
+  lastRenderedIndex = -1;
 }
 
 //------------------------------------------------------------------------------------//
@@ -110,15 +124,17 @@ function handleResize() {
  * @returns {void}
  */
 export function initCanvasRenderer(canvasElement, frameResolverFn, resizeHook) {
+  window.removeEventListener('resize', handleResize);
   canvas = canvasElement;
   if (canvas) {
     ctx = canvas.getContext('2d', { alpha: false });
   }
   getFrameRecord = frameResolverFn;
   onResizeCallback = resizeHook;
+  lastRenderedIndex = -1;
 
   updateCanvasDimensions();
-  window.addEventListener('resize', handleResize);
+  window.addEventListener('resize', handleResize, { passive: true });
 }
 
 //------------------------------End of file---------------------------------------------------//

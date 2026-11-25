@@ -38,7 +38,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
-        booking: path.resolve(__dirname, 'booking.html')
+        booking: path.resolve(__dirname, 'booking.html'),
+        notFound: path.resolve(__dirname, '404.html')
       }
     }
   },

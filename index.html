@@ -6,6 +6,7 @@
   <title>Cape Private Tours — Private Cape Town Guiding by Lance Bowes</title>
   <meta name="description" content="Private Cape Town and Western Cape tours with accredited local guide Lance Bowes. Custom routes shaped around weather, coastal light, and your pace.">
   <link rel="icon" href="data:,">
+  <link rel="preload" as="image" href="/images/hero-table-mountain.webp" fetchpriority="high">
   <link rel="stylesheet" href="/src/styles/tokens.css">
   <link rel="stylesheet" href="/src/styles/base.css">
   <link rel="stylesheet" href="/src/styles/components.css">
@@ -131,13 +132,13 @@
       <!-- Left Column: Open Magazine-Style Photo Mosaic -->
       <div class="guide-mosaic">
         <div class="mosaic-img-box tall">
-          <img src="/images/guide.webp" alt="Lance Bowes, Private Cape Town Tour Guide" class="mosaic-img" loading="lazy">
+          <img src="/images/guide.webp" alt="Lance Bowes, Private Cape Town Tour Guide" class="mosaic-img" loading="lazy" decoding="async">
         </div>
         <div class="mosaic-img-box">
-          <img src="/images/vehicle.webp" alt="Executive 4x4 Private Tour Vehicle" class="mosaic-img" loading="lazy">
+          <img src="/images/vehicle.webp" alt="Executive 4x4 Private Tour Vehicle" class="mosaic-img" loading="lazy" decoding="async">
         </div>
         <div class="mosaic-img-box">
-          <img src="/images/coastal.webp" alt="Coastal cliff trail at Cape Point" class="mosaic-img" loading="lazy">
+          <img src="/images/coastal.webp" alt="Coastal cliff trail at Cape Point" class="mosaic-img" loading="lazy" decoding="async">
         </div>
       </div>
 
@@ -208,6 +209,7 @@
         <div id="review-form-wrap" class="review-form-drawer">
           <form id="guest-review-form" class="guest-review-form" novalidate>
             <h3 class="drawer-form-title">Share Your Experience</h3>
+            <input type="text" name="website" class="hp-field" aria-hidden="true" tabindex="-1" autocomplete="off">
             <div class="form-grid-2">
               <div class="form-field">
                 <label for="review-name" class="field-label">Your Name</label>
@@ -278,11 +280,6 @@
       </nav>
     </div>
   </footer>
-
-  <!-- Debug HUD Panel (Toggled with 'D' key) -->
-  <aside id="debug-hud" class="debug-hud" aria-label="Debug Sequence HUD" role="status">
-    <!-- Populated by debugHud.js -->
-  </aside>
 
   <!-- Main JavaScript Bundle -->
   <script type="module" src="/src/main.js"></script>

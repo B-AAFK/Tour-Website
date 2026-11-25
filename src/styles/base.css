@@ -248,6 +248,15 @@ textarea {
   border-width: 0;
 }
 
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Reduced Motion Respect */
 @media (prefers-reduced-motion: reduce) {
   html {

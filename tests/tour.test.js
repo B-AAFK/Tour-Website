@@ -14,6 +14,28 @@ import {
   getNearestLoadedFrame
 } from '../src/core/frameLoader.js';
 
+import {
+  stripControlChars,
+  normalizeText,
+  validateReviewPayload,
+  validateInquiryPayload
+} from '../src/utils/validator.js';
+
+import {
+  REVIEWS_STORAGE_KEY,
+  MAX_STORED_REVIEWS,
+  SEED_REVIEWS,
+  fetchReviews,
+  createReview,
+  resetReviewServiceState
+} from '../src/services/reviewService.js';
+
+import {
+  INQUIRIES_STORAGE_KEY,
+  submitTourInquiry,
+  resetBookingServiceState
+} from '../src/services/bookingService.js';
+
 //------------------------------------------------------------------------------------//
 describe('1. Centralized Tour Configuration & Destination Stops', () => {
   test('Contains exactly 9 stops with names, regions, regional color tokens, thumbnail frames, and descriptions', () => {
@@ -155,7 +177,8 @@ describe('3. Semantic Structure, Interactive Features & Local Icons8 Assets', ()
     assert.ok(html.includes('id="guide-weather-widget"'));
     assert.ok(html.includes('id="review-star-picker"'));
     assert.ok(html.includes('id="reviews-grid"'));
-    assert.ok(html.includes('id="debug-hud"'));
+    assert.ok(!html.includes('id="debug-hud"'));
+    assert.ok(!fs.existsSync('src/ui/debugHud.js'), 'debugHud.js should be removed');
 
     assert.ok(html.includes('a few of the places I can weave into your private day'));
     assert.ok(html.includes('explored Cape Town and the Peninsula with me'));
@@ -188,6 +211,8 @@ describe('3. Semantic Structure, Interactive Features & Local Icons8 Assets', ()
     assert.ok(html.includes('id="confirmation-traveler-name"'));
     assert.ok(html.includes('id="confirmation-summary-details"'));
     assert.ok(html.includes('Guided by Lance Bowes.'));
+    assert.ok(html.includes('/images/Chapmans_Peak_Drive.webp'));
+    assert.ok(fs.existsSync('public/images/Chapmans_Peak_Drive.webp'));
 
     // Old 3-step card wizard & pill clutter must be removed
     assert.ok(!html.includes('booking-card'));
@@ -312,17 +337,21 @@ describe('4. Design Tokens, Hardcoded Colors, Buzzwords & Formatting Audits', ()
     const jsFiles = [
       'src/main.js',
       'src/booking.js',
+      'src/notFound.js',
       'src/config/tourConfig.js',
       'src/core/canvasRenderer.js',
+      'src/core/errorHandler.js',
       'src/core/frameLoader.js',
       'src/core/scrollController.js',
+      'src/services/bookingService.js',
+      'src/services/reviewService.js',
+      'src/utils/validator.js',
       'src/ui/bookingWizard.js',
       'src/ui/overlayManager.js',
       'src/ui/reviewManager.js',
       'src/ui/guideWeather.js',
       'src/ui/navManager.js',
       'src/ui/icons.js',
-      'src/ui/debugHud.js',
       'vite.config.js'
     ];
 
@@ -348,7 +377,7 @@ describe('4. Design Tokens, Hardcoded Colors, Buzzwords & Formatting Audits', ()
       );
     }
 
-    const htmlFiles = ['index.html', 'booking.html'];
+    const htmlFiles = ['index.html', 'booking.html', '404.html'];
     for (const file of htmlFiles) {
       const content = fs.readFileSync(file, 'utf8').trim();
       assert.ok(
@@ -356,6 +385,208 @@ describe('4. Design Tokens, Hardcoded Colors, Buzzwords & Formatting Audits', ()
         `File ${file} does not end with required end-of-file comment`
       );
     }
+  });
+});
+
+//------------------------------------------------------------------------------------//
+describe('5. Input Validation, Service Adapters & Anti-Bot Controls', () => {
+  function withMockStorage(initial = {}) {
+    const store = new Map(Object.entries(initial));
+    const prev = globalThis.localStorage;
+    globalThis.localStorage = {
+      getItem: (k) => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => store.set(k, String(v)),
+      removeItem: (k) => store.delete(k)
+    };
+    return () => {
+      globalThis.localStorage = prev;
+    };
+  }
+
+  test('validator.js normalizes text, rejects invalid inputs, and supports suggestRoute', () => {
+    assert.equal(stripControlChars('Hello\x00World\x07'), 'Hello World ');
+    assert.equal(normalizeText('  Cape   Town  ', 5), 'Cape');
+
+    const badReview = validateReviewPayload({
+      name: 'A',
+      location: 'X',
+      rating: 6,
+      quote: 'short'
+    });
+    assert.equal(badReview.valid, false);
+    assert.ok(badReview.errors.name);
+    assert.ok(badReview.errors.location);
+    assert.ok(badReview.errors.rating);
+    assert.ok(badReview.errors.quote);
+
+    const xssReview = validateReviewPayload({
+      name: '<script>alert(1)</script>',
+      location: 'London, UK',
+      rating: 5,
+      quote: 'Amazing morning on Table Mountain with <img src=x onerror=alert(1)>.'
+    });
+    assert.equal(xssReview.valid, true);
+    assert.equal(xssReview.data.name, '<script>alert(1)</script>');
+
+    const unallowlisted = validateInquiryPayload({
+      destinations: ['Injected Place'],
+      suggestRoute: false,
+      duration: 'Full Day (8 hrs)',
+      groupSize: '1–2 Guests',
+      name: 'David Vance',
+      email: 'david@example.com'
+    });
+    assert.equal(unallowlisted.valid, false);
+    assert.ok(unallowlisted.errors.destinations);
+
+    const suggested = validateInquiryPayload({
+      destinations: [],
+      suggestRoute: true,
+      duration: 'Full Day (8 hrs)',
+      groupSize: '1–2 Guests',
+      name: 'David Vance',
+      email: 'david@example.com',
+      phone: '+44 7700 900077'
+    });
+    assert.equal(suggested.valid, true);
+    assert.equal(suggested.data.suggestRoute, true);
+    assert.deepEqual(suggested.data.destinations, []);
+  });
+
+  test('reviewService recovers from corrupted storage, caps reviews, and enforces honeypot/cooldown', async () => {
+    const restore = withMockStorage({ [REVIEWS_STORAGE_KEY]: '{corrupted-json' });
+    try {
+      resetReviewServiceState();
+      const fallback = await fetchReviews();
+      assert.equal(fallback.length, SEED_REVIEWS.length);
+
+      const botRes = await createReview(
+        { name: 'Bot', location: 'Spam', rating: 5, quote: 'Automated spam submission.' },
+        { honeypot: 'http://spam.example', formOpenedAt: 1000, now: 5000 }
+      );
+      assert.equal(botRes.ok, true);
+      assert.equal(botRes.botIgnored, true);
+
+      const tooFast = await createReview(
+        { name: 'Fast User', location: 'Berlin', rating: 5, quote: 'Submitted too quickly.' },
+        { honeypot: '', formOpenedAt: 5000, now: 5500 }
+      );
+      assert.equal(tooFast.ok, false);
+
+      const okRes = await createReview(
+        { name: 'Sarah Miller', location: 'Boston, USA', rating: 5, quote: 'Wonderful day out along Chapman Peak.' },
+        { honeypot: '', formOpenedAt: 1000, now: 10000 }
+      );
+      assert.equal(okRes.ok, true);
+
+      const cooldownRes = await createReview(
+        { name: 'Second Try', location: 'Boston, USA', rating: 5, quote: 'Trying right away again.' },
+        { honeypot: '', formOpenedAt: 1000, now: 15000 }
+      );
+      assert.equal(cooldownRes.ok, false);
+
+      // Verify MAX_STORED_REVIEWS cap
+      const oversized = Array.from({ length: MAX_STORED_REVIEWS + 10 }, (_, idx) => ({
+        id: `id-${idx}`,
+        name: `Guest ${idx}`,
+        location: 'Cape Town',
+        rating: 5,
+        quote: 'Lovely private tour around the Cape Peninsula.'
+      }));
+      globalThis.localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(oversized));
+      const capped = await fetchReviews();
+      assert.equal(capped.length, MAX_STORED_REVIEWS);
+    } finally {
+      restore();
+    }
+  });
+
+  test('bookingService enforces honeypot, timing, validation, and cooldown', async () => {
+    const restore = withMockStorage();
+    try {
+      resetBookingServiceState();
+      const botRes = await submitTourInquiry(
+        { name: 'Bot', email: 'bot@example.com' },
+        { honeypot: 'filled', formOpenedAt: 1000, now: 5000 }
+      );
+      assert.equal(botRes.ok, true);
+      assert.equal(botRes.botIgnored, true);
+      assert.equal(globalThis.localStorage.getItem(INQUIRIES_STORAGE_KEY), null);
+
+      const validRes = await submitTourInquiry(
+        {
+          destinations: ['Bo-Kaap'],
+          suggestRoute: false,
+          duration: 'Full Day (8 hrs)',
+          groupSize: '1–2 Guests',
+          name: 'Maya Patel',
+          email: 'maya@example.com'
+        },
+        { honeypot: '', formOpenedAt: 1000, now: 10000 }
+      );
+      assert.equal(validRes.ok, true);
+
+      const cooldownRes = await submitTourInquiry(
+        {
+          destinations: [],
+          suggestRoute: true,
+          duration: 'Half Day (4–5 hrs)',
+          groupSize: '3–4 Guests',
+          name: 'Maya Patel',
+          email: 'maya@example.com'
+        },
+        { honeypot: '', formOpenedAt: 1000, now: 15000 }
+      );
+      assert.equal(cooldownRes.ok, false);
+    } finally {
+      restore();
+    }
+  });
+});
+
+//------------------------------------------------------------------------------------//
+describe('6. Security Hardening, Zero innerHTML, Nginx, robots.txt & 404.html', () => {
+  test('Zero innerHTML assignments exist anywhere inside src/', () => {
+    function scanDir(dir) {
+      for (const item of fs.readdirSync(dir)) {
+        const full = path.join(dir, item);
+        if (fs.statSync(full).isDirectory()) {
+          scanDir(full);
+        } else if (item.endsWith('.js')) {
+          const content = fs.readFileSync(full, 'utf8');
+          assert.doesNotMatch(content, /\.innerHTML\s*=/, `Unsafe innerHTML found in ${full}`);
+        }
+      }
+    }
+    scanDir('src');
+  });
+
+  test('nginx.conf enforces security headers, rate limits, hotlink guard, and 404 page', () => {
+    const nginx = fs.readFileSync('nginx.conf', 'utf8');
+    assert.ok(nginx.includes('server_tokens off;'));
+    assert.ok(nginx.includes('limit_req_status 429;'));
+    assert.ok(nginx.includes('limit_req_zone'));
+    assert.ok(nginx.includes('limit_conn_zone'));
+    assert.ok(nginx.includes('burst=460 nodelay'));
+    assert.ok(nginx.includes('valid_referers'));
+    assert.ok(nginx.includes('error_page 404 /404.html;'));
+    assert.ok(nginx.includes('Content-Security-Policy'));
+    assert.ok(nginx.includes("script-src 'self'"));
+    assert.ok(nginx.includes('X-Frame-Options "DENY" always'));
+    assert.ok(nginx.includes('Permissions-Policy'));
+    assert.ok(nginx.includes('Cross-Origin-Opener-Policy "same-origin" always'));
+    assert.ok(nginx.includes('Cross-Origin-Resource-Policy "same-origin" always'));
+  });
+
+  test('public/robots.txt and 404.html are configured properly', () => {
+    const robots = fs.readFileSync('public/robots.txt', 'utf8');
+    assert.ok(robots.includes('Allow: /'));
+    assert.ok(robots.includes('Allow: /booking.html'));
+    assert.ok(robots.includes('Disallow: /frames/'));
+
+    const notFound = fs.readFileSync('404.html', 'utf8');
+    assert.ok(notFound.includes('href="/"'));
+    assert.ok(notFound.includes('/src/notFound.js'));
   });
 });
 
