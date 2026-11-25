@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 # Copy application source and build dist/
-COPY index.html booking.html vite.config.js ./
+COPY index.html booking.html 404.html vite.config.js ./
 COPY src ./src
 COPY public ./public
 RUN npm run build

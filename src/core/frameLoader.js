@@ -1,5 +1,5 @@
 // =============================================================================
-// Cape Private Tours — Frame Asset Loader & Non-Blocking Preloader
+// Cape Private Tours — Frame Asset Loader & Concurrency-Limited Preloader
 // =============================================================================
 
 import {
@@ -9,12 +9,29 @@ import {
   INITIAL_LOAD_TARGET,
   BACKGROUND_CONCURRENCY
 } from '../config/tourConfig.js';
+import { reportDevError } from './errorHandler.js';
+
+const MAX_FRAME_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 300;
 
 const frameRegistry = [];
 let initialLoadedCount = 0;
-let totalLoadedCount = 0;
 let initialTargetReached = false;
 let onFrameLoadedListener = null;
+
+//------------------------------------------------------------------------------------//
+/**
+ * Schedules a non-urgent callback during browser idle time with a setTimeout fallback.
+ * @param {Function} callback - Function to invoke when the main thread is idle.
+ * @returns {void}
+ */
+function scheduleIdle(callback) {
+  if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(callback, { timeout: 250 });
+  } else {
+    setTimeout(callback, 50);
+  }
+}
 
 //------------------------------------------------------------------------------------//
 /**
@@ -81,16 +98,24 @@ export function getNearestLoadedFrame(targetIndex) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Asynchronously loads an individual image frame with error resilience.
+ * Asynchronously loads an individual image frame with bounded retry logic.
+ * Clears event handlers on settlement to avoid retaining stale closures.
  * @param {Object} frameRecord - Metadata record for the target frame.
  * @param {Function} [onComplete] - Callback receiving (success, frameRecord).
+ * @param {number} [attempt=0] - Current retry attempt count.
  * @returns {void}
  */
-export function loadSingleFrame(frameRecord, onComplete) {
+export function loadSingleFrame(frameRecord, onComplete, attempt = 0) {
   const img = new Image();
   img.decoding = 'async';
 
+  function cleanup() {
+    img.onload = null;
+    img.onerror = null;
+  }
+
   img.onload = () => {
+    cleanup();
     frameRecord.img = img;
     frameRecord.loaded = true;
     frameRecord.error = false;
@@ -101,10 +126,17 @@ export function loadSingleFrame(frameRecord, onComplete) {
   };
 
   img.onerror = () => {
+    cleanup();
+    if (attempt < MAX_FRAME_RETRIES) {
+      const delay = RETRY_BASE_DELAY_MS * Math.pow(3, attempt);
+      setTimeout(() => loadSingleFrame(frameRecord, onComplete, attempt + 1), delay);
+      return;
+    }
+
     frameRecord.img = null;
     frameRecord.loaded = false;
     frameRecord.error = true;
-    console.warn(`[FrameLoader] Frame unavailable: ${frameRecord.url}`);
+    reportDevError('FrameLoader', `Frame unavailable after retries: ${frameRecord.url}`);
     if (onComplete) onComplete(false, frameRecord);
   };
 
@@ -113,24 +145,33 @@ export function loadSingleFrame(frameRecord, onComplete) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Runs a concurrent worker pool to stream the remaining frames in the background.
- * @param {Function} [onProgress] - Optional callback per loaded background frame.
+ * Streams a contiguous range of frame records through a bounded-concurrency queue.
+ * @param {number} startIdx - Inclusive starting registry index.
+ * @param {number} endIdx - Exclusive ending registry index.
+ * @param {Function} onEach - Callback invoked after each frame settles.
+ * @param {Function} [onBatchDone] - Optional callback invoked once the entire range finishes.
  * @returns {void}
  */
-function startBackgroundStream(onProgress) {
-  let cursor = INITIAL_LOAD_TARGET;
+function streamRangeBounded(startIdx, endIdx, onEach, onBatchDone) {
+  let cursor = startIdx;
   let activeWorkers = 0;
+  let completed = false;
 
   function pump() {
-    while (activeWorkers < BACKGROUND_CONCURRENCY && cursor < frameRegistry.length) {
+    if (cursor >= endIdx && activeWorkers === 0 && !completed) {
+      completed = true;
+      if (onBatchDone) onBatchDone();
+      return;
+    }
+
+    while (activeWorkers < BACKGROUND_CONCURRENCY && cursor < endIdx) {
       const record = frameRegistry[cursor];
       cursor++;
       activeWorkers++;
 
-      loadSingleFrame(record, () => {
+      loadSingleFrame(record, (success, settledRecord) => {
         activeWorkers--;
-        totalLoadedCount++;
-        if (onProgress) onProgress(totalLoadedCount, frameRegistry.length);
+        if (onEach) onEach(success, settledRecord);
         pump();
       });
     }
@@ -141,8 +182,8 @@ function startBackgroundStream(onProgress) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Initiates the non-blocking progressive loading sequence in the background.
- * Buffers INITIAL_LOAD_TARGET frames before calling onInitialReady.
+ * Initiates concurrency-limited progressive loading: buffers INITIAL_LOAD_TARGET
+ * frames first, then streams the remaining sequence during browser idle windows.
  * @param {Function} onInitialReady - Called when the initial buffer is ready.
  * @param {Function} onInitialProgress - Called on each initial frame load (pct, count, target).
  * @returns {void}
@@ -150,40 +191,29 @@ function startBackgroundStream(onProgress) {
 export function startProgressiveLoader(onInitialReady, onInitialProgress) {
   const initialBatchLimit = Math.min(INITIAL_LOAD_TARGET, frameRegistry.length);
   initialLoadedCount = 0;
-  totalLoadedCount = 0;
   initialTargetReached = false;
 
-  for (let i = 0; i < initialBatchLimit; i++) {
-    const record = frameRegistry[i];
-    loadSingleFrame(record, () => {
+  streamRangeBounded(
+    0,
+    initialBatchLimit,
+    () => {
       initialLoadedCount++;
-      totalLoadedCount++;
 
       const pct = Math.min(100, Math.floor((initialLoadedCount / initialBatchLimit) * 100));
       if (onInitialProgress) {
         onInitialProgress(pct, initialLoadedCount, initialBatchLimit);
       }
-
-      if (initialLoadedCount >= initialBatchLimit && !initialTargetReached) {
+    },
+    () => {
+      if (!initialTargetReached) {
         initialTargetReached = true;
         if (onInitialReady) onInitialReady();
-        startBackgroundStream();
+        scheduleIdle(() => {
+          streamRangeBounded(initialBatchLimit, frameRegistry.length);
+        });
       }
-    });
-  }
-}
-
-//------------------------------------------------------------------------------------//
-/**
- * Returns current loading statistics for the HUD and status monitors.
- * @returns {{ loaded: number, total: number, initialReady: boolean }} Loading statistics.
- */
-export function getLoadingStats() {
-  return {
-    loaded: totalLoadedCount,
-    total: frameRegistry.length,
-    initialReady: initialTargetReached
-  };
+    }
+  );
 }
 
 //------------------------------------------------------------------------------------//

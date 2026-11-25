@@ -5,15 +5,17 @@
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
+import { initGlobalErrorHandlers } from './core/errorHandler.js';
 import { initBookingWizard } from './ui/bookingWizard.js';
 import { mountStaticIcons } from './ui/icons.js';
 
 //------------------------------------------------------------------------------------//
 /**
- * Initializes local icon masks and the 2-step Split-Screen Visual Concierge.
+ * Initializes global error handlers, local icon masks, and the 2-step Split-Screen Concierge.
  * @returns {void}
  */
 function initBookingPage() {
+  initGlobalErrorHandlers();
   mountStaticIcons();
   initBookingWizard();
 }

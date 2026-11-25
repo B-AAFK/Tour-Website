@@ -2,7 +2,7 @@
 // Cape Private Tours — Interactive "How I Read the Day" Weather Pivot Widget
 // =============================================================================
 
-import { getIconMarkup } from './icons.js';
+import { createIconElement } from './icons.js';
 
 const WEATHER_SCENARIOS = [
   {
@@ -60,49 +60,55 @@ function selectWeatherScenario(widgetEl, scenarioId) {
 //------------------------------------------------------------------------------------//
 /**
  * Initializes the interactive 3-tab "How I Read the Day" weather widget in #guide.
+ * Uses pure DOM construction without innerHTML.
  * @returns {void}
  */
 export function initGuideWeather() {
   const widgetEl = document.getElementById('guide-weather-widget');
   if (!widgetEl) return;
 
-  const tabsHtml = WEATHER_SCENARIOS.map((item, idx) => {
+  const header = document.createElement('div');
+  header.className = 'weather-widget-header';
+  const title = document.createElement('h3');
+  title.className = 'weather-widget-title';
+  title.textContent = 'How I Read the Day';
+  header.appendChild(title);
+
+  const tabList = document.createElement('div');
+  tabList.className = 'weather-tabs-list';
+  tabList.setAttribute('role', 'tablist');
+  tabList.setAttribute('aria-label', 'Cape Town Weather Scenarios');
+
+  const tabButtons = WEATHER_SCENARIOS.map((item, idx) => {
     const isActive = idx === 0;
-    return `
-      <button
-        type="button"
-        id="weather-tab-${item.id}"
-        class="weather-tab-btn${isActive ? ' is-active' : ''}"
-        role="tab"
-        aria-selected="${isActive}"
-        aria-controls="guide-weather-panel"
-        tabindex="${isActive ? '0' : '-1'}"
-        data-scenario="${item.id}"
-        style="--weather-accent: ${item.accentToken}"
-      >
-        ${getIconMarkup(item.icon, 'icon-sm')}
-        <span>${item.label}</span>
-      </button>
-    `;
-  }).join('');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = `weather-tab-${item.id}`;
+    btn.className = isActive ? 'weather-tab-btn is-active' : 'weather-tab-btn';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', String(isActive));
+    btn.setAttribute('aria-controls', 'guide-weather-panel');
+    btn.setAttribute('tabindex', isActive ? '0' : '-1');
+    btn.dataset.scenario = item.id;
+    btn.style.setProperty('--weather-accent', item.accentToken);
 
-  widgetEl.innerHTML = `
-    <div class="weather-widget-header">
-      <h3 class="weather-widget-title">How I Read the Day</h3>
-    </div>
-    <div class="weather-tabs-list" role="tablist" aria-label="Cape Town Weather Scenarios">
-      ${tabsHtml}
-    </div>
-    <div
-      id="guide-weather-panel"
-      class="weather-tab-panel"
-      role="tabpanel"
-      aria-labelledby="weather-tab-${WEATHER_SCENARIOS[0].id}"
-      style="--weather-accent: ${WEATHER_SCENARIOS[0].accentToken}"
-    >${WEATHER_SCENARIOS[0].summary}</div>
-  `;
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = item.label;
+    btn.append(createIconElement(item.icon, 'icon-sm'), labelSpan);
+    tabList.appendChild(btn);
+    return btn;
+  });
 
-  const tabButtons = Array.from(widgetEl.querySelectorAll('[role="tab"]'));
+  const panel = document.createElement('div');
+  panel.id = 'guide-weather-panel';
+  panel.className = 'weather-tab-panel';
+  panel.setAttribute('role', 'tabpanel');
+  panel.setAttribute('aria-labelledby', `weather-tab-${WEATHER_SCENARIOS[0].id}`);
+  panel.style.setProperty('--weather-accent', WEATHER_SCENARIOS[0].accentToken);
+  panel.textContent = WEATHER_SCENARIOS[0].summary;
+
+  widgetEl.replaceChildren(header, tabList, panel);
+
   tabButtons.forEach((btn, idx) => {
     btn.addEventListener('click', () => {
       selectWeatherScenario(widgetEl, btn.dataset.scenario);

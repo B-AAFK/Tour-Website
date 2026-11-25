@@ -163,7 +163,7 @@
   justify-content: flex-start;
   text-align: left;
   background-color: var(--surface-dark);
-  background-image: url('/images/hero-table-mountain.jpg');
+  background-image: url('/images/hero-table-mountain.webp');
   background-size: cover;
   background-position: center 45%;
   background-repeat: no-repeat;
@@ -525,6 +525,7 @@
 
 .mosaic-img-box {
   width: 100%;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background-color: var(--surface-secondary);
   border: 1px solid var(--border-subtle);
@@ -533,6 +534,7 @@
 .mosaic-img-box.tall {
   grid-column: 1 / 2;
   grid-row: 1 / 3;
+  aspect-ratio: auto;
 }
 
 .mosaic-img {
@@ -1623,65 +1625,53 @@ textarea.is-invalid {
 }
 
 /* -----------------------------------------------------------------------------
-   Debug HUD Panel (Toggled with 'D' key)
+   Branded 404 Error Page (`404.html`)
    ----------------------------------------------------------------------------- */
-.debug-hud {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: var(--z-hud);
-  background-color: var(--surface-dark);
-  border: 1px solid var(--border-dark);
-  color: var(--ink-on-dark);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  padding: 16px;
-  width: 320px;
-  line-height: 1.5;
-  font-variant-numeric: tabular-nums;
-}
-
-.debug-hud.is-visible {
-  display: block;
-}
-
-.hud-header {
+.not-found-section {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-dark);
-  padding-bottom: 6px;
-  margin-bottom: 8px;
+  justify-content: center;
+  padding: 32px 20px;
+  background-color: var(--surface-secondary);
 }
 
-.hud-title {
-  font-weight: 700;
-  color: var(--accent-sun);
-}
-
-.hud-key-tag {
-  color: var(--ink-on-dark-muted);
-}
-
-.hud-row {
+.not-found-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  background-color: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 48px 40px;
   display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
 }
 
-.hud-label {
-  color: var(--ink-on-dark-muted);
+.not-found-trim {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.hud-val {
-  font-weight: 700;
-  text-align: right;
+.not-found-title {
+  font-size: clamp(1.85rem, 3vw, 2.4rem);
+  font-weight: 400;
+  color: var(--ink-primary);
 }
 
-.hud-accent {
-  color: var(--accent-primary);
+.not-found-copy {
+  font-size: 16px;
+  color: var(--ink-secondary);
+  max-width: 52ch;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 8px;
 }
 
 /* -----------------------------------------------------------------------------
@@ -1877,13 +1867,6 @@ textarea.is-invalid {
   .footer-links {
     flex-wrap: wrap;
     gap: 16px;
-  }
-
-  .debug-hud {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    width: auto;
   }
 }
 

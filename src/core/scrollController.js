@@ -56,14 +56,7 @@ function setupCinemaScroll(totalFrames, onFrameTick) {
       end: `+=${OPTION_B_SCROLL_DISTANCE}`,
       pin: pinnedWrapper,
       scrub: 0.5,
-      anticipatePin: 1,
-      onUpdate: (self) => {
-        currentProgress = self.progress;
-        currentFrameIndex = Math.round(playhead.frame);
-        if (onFrameTick) {
-          onFrameTick(currentFrameIndex, currentProgress);
-        }
-      }
+      anticipatePin: 1
     }
   });
 
@@ -137,24 +130,6 @@ export function scrollToFrame(targetFrame) {
  */
 export function refreshScroll() {
   ScrollTrigger.refresh();
-}
-
-//------------------------------------------------------------------------------------//
-/**
- * Returns the current normalized scroll progress (0.0 - 1.0).
- * @returns {number} Current progress.
- */
-export function getScrollProgress() {
-  return currentProgress;
-}
-
-//------------------------------------------------------------------------------------//
-/**
- * Returns the currently active layout mode identifier.
- * @returns {string} Always returns 'cinema-frame'.
- */
-export function getCurrentScrollMode() {
-  return 'cinema-frame';
 }
 
 //------------------------------End of file---------------------------------------------------//

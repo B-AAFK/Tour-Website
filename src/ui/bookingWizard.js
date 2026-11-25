@@ -3,9 +3,12 @@
 // =============================================================================
 
 import { ASSET_BASE_URL, STOPS } from '../config/tourConfig.js';
-import { getIconMarkup } from './icons.js';
+import { createIconElement } from './icons.js';
+import { submitTourInquiry } from '../services/bookingService.js';
 
 let currentStep = 1;
+let step2OpenedAt = Date.now();
+
 const conciergeState = {
   destinations: [],
   suggestRoute: false,
@@ -82,6 +85,7 @@ export function goToStep(stepNumber) {
   });
 
   if (currentStep === 2) {
+    step2OpenedAt = Date.now();
     syncSummaryDisplays();
   }
 
@@ -99,6 +103,43 @@ export function goToStep(stepNumber) {
 
 //------------------------------------------------------------------------------------//
 /**
+ * Builds a single visual destination tile element safely without innerHTML.
+ * @param {Object} stop - Destination stop record from STOPS.
+ * @returns {HTMLButtonElement} Interactive tile button.
+ */
+function createDestinationTileElement(stop) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'dest-tile';
+  btn.dataset.name = stop.name;
+  btn.setAttribute('aria-pressed', 'false');
+
+  const img = document.createElement('img');
+  img.src = encodeURI(`${ASSET_BASE_URL}${stop.thumbnailFrame}`);
+  img.alt = stop.name;
+  img.className = 'dest-tile-img';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+
+  const scrim = document.createElement('span');
+  scrim.className = 'dest-tile-scrim';
+  scrim.setAttribute('aria-hidden', 'true');
+
+  const checkWrap = document.createElement('span');
+  checkWrap.className = 'dest-tile-check';
+  checkWrap.setAttribute('aria-hidden', 'true');
+  checkWrap.appendChild(createIconElement('check-circle', 'icon-sm'));
+
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'dest-tile-name';
+  nameSpan.textContent = stop.name;
+
+  btn.append(img, scrim, checkWrap, nameSpan);
+  return btn;
+}
+
+//------------------------------------------------------------------------------------//
+/**
  * Renders the 9 visual 16:10 destination tiles from STOPS with zero pre-selected.
  * @returns {void}
  */
@@ -106,26 +147,14 @@ function renderDestinationTiles() {
   const gridEl = document.getElementById('dest-tiles-grid');
   if (!gridEl) return;
 
-  gridEl.innerHTML = STOPS.map((stop) => {
-    const imgSrc = encodeURI(`${ASSET_BASE_URL}${stop.thumbnailFrame}`);
-    return `
-      <button
-        type="button"
-        class="dest-tile"
-        data-name="${stop.name}"
-        aria-pressed="false"
-      >
-        <img src="${imgSrc}" alt="${stop.name}" class="dest-tile-img" loading="lazy">
-        <span class="dest-tile-scrim" aria-hidden="true"></span>
-        <span class="dest-tile-check" aria-hidden="true">
-          ${getIconMarkup('check-circle', 'icon-sm')}
-        </span>
-        <span class="dest-tile-name">${stop.name}</span>
-      </button>
-    `;
-  }).join('');
+  const fragment = document.createDocumentFragment();
+  const tiles = STOPS.map((stop) => {
+    const tile = createDestinationTileElement(stop);
+    fragment.appendChild(tile);
+    return tile;
+  });
+  gridEl.replaceChildren(fragment);
 
-  const tiles = Array.from(gridEl.querySelectorAll('.dest-tile'));
   const suggestBtn = document.getElementById('route-suggest-toggle');
 
   tiles.forEach((tile) => {
@@ -211,51 +240,25 @@ function bindOptionGroup(groupName, onChange) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Validates Step 2 required traveler fields (Full Name and Email Address).
- * @param {HTMLInputElement|null} nameInput - Full name input element.
- * @param {HTMLInputElement|null} emailInput - Email address input element.
- * @returns {{ valid: boolean, message: string, firstInvalid: HTMLElement|null }} Validation state.
+ * Applies field-level validation flags and focuses the first invalid control.
+ * @param {Object} errors - Field-keyed error dictionary.
+ * @param {Object} fieldMap - Map of field keys to DOM inputs.
+ * @returns {void}
  */
-function validateContactFields(nameInput, emailInput) {
-  const name = nameInput ? nameInput.value.trim() : '';
-  const email = emailInput ? emailInput.value.trim() : '';
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  const nameValid = name.length > 0;
-  const emailValid = email.length > 0 && emailPattern.test(email);
-
-  if (nameInput) {
-    nameInput.classList.toggle('is-invalid', !nameValid);
-    nameInput.setAttribute('aria-invalid', String(!nameValid));
+function applyFieldErrors(errors, fieldMap) {
+  let firstInvalid = null;
+  Object.entries(fieldMap).forEach(([key, input]) => {
+    if (!input) return;
+    const hasErr = Boolean(errors && errors[key]);
+    input.classList.toggle('is-invalid', hasErr);
+    input.setAttribute('aria-invalid', String(hasErr));
+    if (hasErr && !firstInvalid) {
+      firstInvalid = input;
+    }
+  });
+  if (firstInvalid) {
+    firstInvalid.focus();
   }
-  if (emailInput) {
-    emailInput.classList.toggle('is-invalid', !emailValid);
-    emailInput.setAttribute('aria-invalid', String(!emailValid));
-  }
-
-  if (!nameValid && !emailValid) {
-    return {
-      valid: false,
-      message: 'Please enter your name and a valid email address so I can reply with your route and quote.',
-      firstInvalid: nameInput
-    };
-  }
-  if (!nameValid) {
-    return {
-      valid: false,
-      message: 'Please enter your name so I know how to address your reply.',
-      firstInvalid: nameInput
-    };
-  }
-  if (!emailValid) {
-    return {
-      valid: false,
-      message: 'Please enter a valid email address (for example, name@example.com).',
-      firstInvalid: emailInput
-    };
-  }
-
-  return { valid: true, message: '', firstInvalid: null };
 }
 
 //------------------------------------------------------------------------------------//
@@ -305,74 +308,75 @@ export function initBookingWizard() {
   const confirmationName = document.getElementById('confirmation-traveler-name');
   const confirmationSummary = document.getElementById('confirmation-summary-details');
 
-  if (inquiryForm) {
-    const nameInput = document.getElementById('inquiry-name');
-    const emailInput = document.getElementById('inquiry-email');
+  if (!inquiryForm) return;
 
-    [nameInput, emailInput].forEach((field) => {
-      if (!field) return;
-      field.addEventListener('input', () => {
-        field.classList.remove('is-invalid');
-        field.removeAttribute('aria-invalid');
-      });
+  const nameInput = document.getElementById('inquiry-name');
+  const emailInput = document.getElementById('inquiry-email');
+  const phoneInput = document.getElementById('inquiry-phone');
+  const countryInput = document.getElementById('inquiry-country');
+  const honeypotInput = inquiryForm.querySelector('input[name="website"]');
+
+  [nameInput, emailInput, phoneInput].forEach((field) => {
+    if (!field) return;
+    field.addEventListener('input', () => {
+      field.classList.remove('is-invalid');
+      field.removeAttribute('aria-invalid');
     });
+  });
 
-    inquiryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+  inquiryForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const phoneInput = document.getElementById('inquiry-phone');
-      const countryInput = document.getElementById('inquiry-country');
-
-      const validation = validateContactFields(nameInput, emailInput);
-      if (!validation.valid) {
-        if (statusEl) {
-          statusEl.textContent = validation.message;
-          statusEl.className = 'form-status is-error';
-        }
-        if (validation.firstInvalid) {
-          validation.firstInvalid.focus();
-        }
-        return;
+    const result = await submitTourInquiry(
+      {
+        destinations: conciergeState.destinations,
+        suggestRoute: conciergeState.suggestRoute,
+        duration: conciergeState.duration,
+        groupSize: conciergeState.groupSize,
+        dates: datesInput ? datesInput.value : '',
+        notes: notesInput ? notesInput.value : '',
+        name: nameInput ? nameInput.value : '',
+        email: emailInput ? emailInput.value : '',
+        phone: phoneInput ? phoneInput.value : '',
+        country: countryInput ? countryInput.value : ''
+      },
+      {
+        honeypot: honeypotInput ? honeypotInput.value : '',
+        formOpenedAt: step2OpenedAt
       }
+    );
 
-      conciergeState.name = nameInput ? nameInput.value.trim() : '';
-      conciergeState.email = emailInput ? emailInput.value.trim() : '';
-      conciergeState.phone = phoneInput ? phoneInput.value.trim() : '';
-      conciergeState.country = countryInput ? countryInput.value.trim() : '';
-
-      try {
-        const storedInquiries = JSON.parse(localStorage.getItem('cape_private_tours_inquiries') || '[]');
-        storedInquiries.push({
-          ...conciergeState,
-          timestamp: new Date().toISOString()
-        });
-        localStorage.setItem('cape_private_tours_inquiries', JSON.stringify(storedInquiries));
-      } catch (err) {
-        console.warn('[Concierge] Could not persist inquiry:', err);
+    if (!result.ok) {
+      applyFieldErrors(result.errors, { name: nameInput, email: emailInput, phone: phoneInput });
+      if (statusEl) {
+        statusEl.textContent = result.message || 'Please check your contact details.';
+        statusEl.className = 'form-status is-error';
       }
+      return;
+    }
 
-      if (confirmationName) {
-        confirmationName.textContent = conciergeState.name;
-      }
+    const displayInquiry = result.inquiry || conciergeState;
+    if (confirmationName) {
+      confirmationName.textContent = displayInquiry.name || 'Traveler';
+    }
 
-      if (confirmationSummary) {
-        const dateSegment = conciergeState.dates ? ` · ${conciergeState.dates}` : '';
-        confirmationSummary.textContent = `${conciergeState.duration} · ${conciergeState.groupSize}${dateSegment} · ${formatPlacesSummary()}`;
-      }
+    if (confirmationSummary) {
+      const dateSegment = displayInquiry.dates ? ` · ${displayInquiry.dates}` : '';
+      confirmationSummary.textContent = `${conciergeState.duration} · ${conciergeState.groupSize}${dateSegment} · ${formatPlacesSummary()}`;
+    }
 
-      document.querySelectorAll('.concierge-step-panel').forEach((panel) => {
-        panel.classList.remove('is-active');
-      });
-      if (stepStatusEl) {
-        stepStatusEl.textContent = 'Inquiry Received';
-      }
-      if (confirmationCard) {
-        confirmationCard.classList.remove('is-hidden');
-      }
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll('.concierge-step-panel').forEach((panel) => {
+      panel.classList.remove('is-active');
     });
-  }
+    if (stepStatusEl) {
+      stepStatusEl.textContent = 'Inquiry Received';
+    }
+    if (confirmationCard) {
+      confirmationCard.classList.remove('is-hidden');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 //------------------------------End of file---------------------------------------------------//

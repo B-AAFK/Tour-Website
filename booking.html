@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plan Your Day — Cape Private Tours</title>
-  <meta name="description" content="Plan your private Cape Town tour with Lance Bowes using a calm two-step visual concierge: choose Cape Town places, pick timing and group size, and request a personal quote.">
+  <meta name="description"
+    content="Plan your private Cape Town tour with Lance Bowes using a calm two-step visual concierge: choose Cape Town places, pick timing and group size, and request a personal quote.">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/src/styles/tokens.css">
   <link rel="stylesheet" href="/src/styles/base.css">
   <link rel="stylesheet" href="/src/styles/components.css">
 </head>
+
 <body class="page-booking">
 
   <main class="concierge-layout" role="main">
@@ -17,7 +20,8 @@
     <!-- Left Column: Sticky Atmospheric Guide Panel -->
     <aside class="concierge-panel" aria-label="Concierge Overview and Direct Contact">
       <div class="concierge-hero-crop">
-        <img src="/images/hero-table-mountain.jpg" alt="Table Mountain towering over Cape Town at golden hour" class="concierge-hero-img">
+        <img src="/images/Chapmans_Peak_Drive.webp" alt="Chapman's Peak Drive winding along the coast"
+          class="concierge-hero-img" fetchpriority="high" decoding="async">
         <div class="concierge-hero-scrim" aria-hidden="true"></div>
         <a href="index.html" class="concierge-back-link">
           <span class="icon-glyph icon-sm" data-icon="arrow-left" aria-hidden="true"></span>
@@ -28,17 +32,20 @@
       <div class="concierge-panel-body">
         <h1 class="concierge-title">Plan Your Day in Cape Town</h1>
         <p class="concierge-intro">
-          Tell me what catches your eye and how you like to travel. Every route and quote is shaped personally around Cape Town's morning wind, light, and your own pace.
+          Tell me what catches your eye and how you like to travel. Every route and quote is shaped personally around
+          Cape Town's morning wind, light, and your own pace.
         </p>
         <p class="concierge-intro-secondary">
-          No rigid bus schedules or agency markups&mdash;just a private vehicle and a thoughtful day planned with Lance Bowes.
+          No rigid bus schedules or agency markups&mdash;just a private vehicle and a thoughtful day planned with Lance
+          Bowes.
         </p>
       </div>
 
       <div class="concierge-contact-strip">
         <p class="concierge-contact-heading">Prefer to chat directly?</p>
         <div class="concierge-contact-links">
-          <a href="https://wa.me/27000000000" target="_blank" rel="noopener noreferrer" class="concierge-contact-link">WhatsApp (+27 00 000 0000)</a>
+          <a href="https://wa.me/27000000000" target="_blank" rel="noopener noreferrer"
+            class="concierge-contact-link">WhatsApp (+27 00 000 0000)</a>
           <span class="concierge-contact-sep" aria-hidden="true">&middot;</span>
           <a href="mailto:lance@capeprivatetours.co.za" class="concierge-contact-link">lance@capeprivatetours.co.za</a>
         </div>
@@ -51,13 +58,15 @@
       <div class="concierge-workspace-inner">
 
         <!-- Quiet Plain-Text Step Indicator -->
-        <p id="concierge-step-status" class="concierge-step-status" aria-live="polite">Step 1 of 2 &mdash; Shape Your Day</p>
+        <p id="concierge-step-status" class="concierge-step-status" aria-live="polite">Step 1 of 2 &mdash; Shape Your
+          Day</p>
 
         <!-- Step 1: Visual Destination Photo Grid & Typographic Timing Controls -->
         <div id="concierge-step-1" class="concierge-step-panel is-active" data-step="1">
           <header class="concierge-step-header">
             <h2 class="concierge-step-heading">Where would you like to explore?</h2>
-            <p class="concierge-step-subtext">Pick any corners of Cape Town that draw you in, or leave the entire route to me.</p>
+            <p class="concierge-step-subtext">Pick any corners of Cape Town that draw you in, or leave the entire route
+              to me.</p>
           </header>
 
           <div id="dest-tiles-grid" class="dest-tiles-grid" role="group" aria-label="Cape Town destination highlights">
@@ -65,7 +74,8 @@
           </div>
 
           <button type="button" id="route-suggest-toggle" class="route-suggest-toggle" aria-pressed="false">
-            <span class="route-suggest-copy">Not sure where to start? Leave the route to me and I will suggest a day.</span>
+            <span class="route-suggest-copy">Not sure where to start? Leave the route to me and I will suggest a
+              day.</span>
             <span class="route-suggest-indicator" aria-hidden="true">
               <span class="icon-glyph icon-sm" data-icon="check-circle"></span>
             </span>
@@ -75,25 +85,33 @@
             <div class="concierge-toggle-block">
               <span id="duration-group-label" class="concierge-group-label">Duration</span>
               <div class="concierge-option-row" role="radiogroup" aria-labelledby="duration-group-label">
-                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1" data-group="duration" data-val="Half Day (4–5 hrs)">Half Day (4–5 hrs)</button>
-                <button type="button" class="concierge-option-btn is-active" role="radio" aria-checked="true" tabindex="0" data-group="duration" data-val="Full Day (8 hrs)">Full Day (8 hrs)</button>
-                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1" data-group="duration" data-val="Multi-Day">Multi-Day</button>
+                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1"
+                  data-group="duration" data-val="Half Day (4–5 hrs)">Half Day (4–5 hrs)</button>
+                <button type="button" class="concierge-option-btn is-active" role="radio" aria-checked="true"
+                  tabindex="0" data-group="duration" data-val="Full Day (8 hrs)">Full Day (8 hrs)</button>
+                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1"
+                  data-group="duration" data-val="Multi-Day">Multi-Day</button>
               </div>
             </div>
 
             <div class="concierge-toggle-block">
               <span id="group-size-label" class="concierge-group-label">Group Size</span>
               <div class="concierge-option-row" role="radiogroup" aria-labelledby="group-size-label">
-                <button type="button" class="concierge-option-btn is-active" role="radio" aria-checked="true" tabindex="0" data-group="group-size" data-val="1–2 Guests">1–2</button>
-                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1" data-group="group-size" data-val="3–4 Guests">3–4</button>
-                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1" data-group="group-size" data-val="5–6 Guests">5–6</button>
-                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1" data-group="group-size" data-val="7+ Guests">7+ Guests</button>
+                <button type="button" class="concierge-option-btn is-active" role="radio" aria-checked="true"
+                  tabindex="0" data-group="group-size" data-val="1–2 Guests">1–2</button>
+                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1"
+                  data-group="group-size" data-val="3–4 Guests">3–4</button>
+                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1"
+                  data-group="group-size" data-val="5–6 Guests">5–6</button>
+                <button type="button" class="concierge-option-btn" role="radio" aria-checked="false" tabindex="-1"
+                  data-group="group-size" data-val="7+ Guests">7+ Guests</button>
               </div>
             </div>
           </div>
 
           <div class="concierge-action-row">
-            <span id="step1-live-readout" class="concierge-live-readout" aria-live="polite">0 places selected &middot; Full Day (8 hrs)</span>
+            <span id="step1-live-readout" class="concierge-live-readout" aria-live="polite">0 places selected &middot;
+              Full Day (8 hrs)</span>
             <button type="button" id="btn-next-step-2" class="btn-primary">
               <span>Next: Your Details</span>
               <span class="icon-glyph icon-sm" data-icon="arrow-right" aria-hidden="true"></span>
@@ -109,41 +127,50 @@
           </header>
 
           <div class="concierge-recap-strip">
-            <span id="step2-recap-text" class="concierge-recap-text">Full Day (8 hrs) &middot; 1–2 Guests &middot; Flexible Route</span>
+            <span id="step2-recap-text" class="concierge-recap-text">Full Day (8 hrs) &middot; 1–2 Guests &middot;
+              Flexible Route</span>
             <button type="button" id="btn-change-step-1" class="concierge-change-btn">Change</button>
           </div>
 
           <form id="booking-inquiry-form" class="concierge-form" novalidate>
+            <input type="text" name="website" class="hp-field" aria-hidden="true" tabindex="-1" autocomplete="off">
             <div class="concierge-underline-grid">
               <div class="concierge-underline-field">
                 <label for="inquiry-name" class="concierge-field-label">Full Name</label>
-                <input type="text" id="inquiry-name" name="name" class="concierge-underline-input" autocomplete="name" required placeholder="e.g. David Vance">
+                <input type="text" id="inquiry-name" name="name" class="concierge-underline-input" autocomplete="name"
+                  required placeholder="e.g. David Vance">
               </div>
 
               <div class="concierge-underline-field">
                 <label for="inquiry-email" class="concierge-field-label">Email Address</label>
-                <input type="email" id="inquiry-email" name="email" class="concierge-underline-input" autocomplete="email" required placeholder="e.g. david@example.com">
+                <input type="email" id="inquiry-email" name="email" class="concierge-underline-input"
+                  autocomplete="email" required placeholder="e.g. david@example.com">
               </div>
 
               <div class="concierge-underline-field">
                 <label for="inquiry-phone" class="concierge-field-label">WhatsApp or Phone (Optional)</label>
-                <input type="tel" id="inquiry-phone" name="phone" class="concierge-underline-input" autocomplete="tel" placeholder="e.g. +44 7700 900077">
+                <input type="tel" id="inquiry-phone" name="phone" class="concierge-underline-input" autocomplete="tel"
+                  placeholder="e.g. +44 7700 900077">
               </div>
 
               <div class="concierge-underline-field">
                 <label for="inquiry-country" class="concierge-field-label">Country / City</label>
-                <input type="text" id="inquiry-country" name="country" class="concierge-underline-input" autocomplete="country-name" placeholder="e.g. London, UK">
+                <input type="text" id="inquiry-country" name="country" class="concierge-underline-input"
+                  autocomplete="country-name" placeholder="e.g. London, UK">
               </div>
 
               <div class="concierge-underline-field is-full">
                 <label for="inquiry-dates" class="concierge-field-label">Preferred Dates</label>
-                <input type="text" id="inquiry-dates" name="dates" class="concierge-underline-input" autocomplete="off" placeholder="e.g. 14–18 November 2026 or flexible">
+                <input type="text" id="inquiry-dates" name="dates" class="concierge-underline-input" autocomplete="off"
+                  placeholder="e.g. 14–18 November 2026 or flexible">
               </div>
             </div>
 
             <div class="concierge-underline-field">
-              <label for="inquiry-notes" class="concierge-field-label">Anything else I should know? (wine preferences, pace, photography, mobility)</label>
-              <textarea id="inquiry-notes" name="notes" class="concierge-textarea" rows="3" placeholder="Tell me if you love coastal walks, quiet cellars, birdlife, or slow mornings..."></textarea>
+              <label for="inquiry-notes" class="concierge-field-label">Anything else I should know? (wine preferences,
+                pace, photography, mobility)</label>
+              <textarea id="inquiry-notes" name="notes" class="concierge-textarea" rows="3"
+                placeholder="Tell me if you love coastal walks, quiet cellars, birdlife, or slow mornings..."></textarea>
             </div>
 
             <p class="reassure-note">
@@ -179,7 +206,8 @@
           </div>
           <div id="confirmation-summary-details" class="confirmation-details-box"></div>
           <p class="confirmation-message">
-            I have received your inquiry and will reply personally with a suggested Cape Town route and transparent quote within a few hours (SAST).
+            I have received your inquiry and will reply personally with a suggested Cape Town route and transparent
+            quote within a few hours (SAST).
           </p>
           <a href="index.html" class="btn-primary">
             <span class="icon-glyph icon-sm" data-icon="arrow-left" aria-hidden="true"></span>
@@ -204,5 +232,6 @@
 
   <script type="module" src="/src/booking.js"></script>
 </body>
+
 </html>
 <!-- ------------------------------End of file--------------------------------------------------- -->

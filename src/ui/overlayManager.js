@@ -3,7 +3,7 @@
 // =============================================================================
 
 import { STOPS, getStopByFrame } from '../config/tourConfig.js';
-import { getIconMarkup } from './icons.js';
+import { createIconElement } from './icons.js';
 
 let captionBarEl = null;
 let captionNameEl = null;
@@ -44,45 +44,50 @@ function getContextualStop(frameIndex) {
 
 //------------------------------------------------------------------------------------//
 /**
- * Renders the interactive 9-stop horizontal chapter scrubber beneath the progress bar.
+ * Renders the interactive 9-stop horizontal chapter scrubber using safe DOM construction.
  * @param {Function} [onSelectStop] - Callback invoked with target startFrame when clicked.
  * @returns {void}
  */
 function renderChapterScrubber(onSelectStop) {
   if (!chapterScrubberEl) return;
 
-  chapterScrubberEl.innerHTML = STOPS.map((stop) => {
+  const fragment = document.createDocumentFragment();
+  chapterButtons = STOPS.map((stop) => {
     const shortName = stop.name
       .replace(' Nature Reserve', '')
       .replace(' Gardens', '')
       .replace(' Winelands', '')
       .replace('Cape of Good Hope', 'Good Hope');
 
-    return `
-      <button
-        type="button"
-        class="chapter-marker"
-        data-stop-id="${stop.id}"
-        data-start-frame="${stop.startFrame}"
-        style="--chapter-color: ${stop.regionColorToken}"
-        aria-label="Jump to ${stop.name} (${stop.region})"
-        title="${stop.name}"
-      >
-        <span class="chapter-marker-dot" aria-hidden="true"></span>
-        <span class="chapter-marker-label">${shortName}</span>
-      </button>
-    `;
-  }).join('');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chapter-marker';
+    btn.dataset.stopId = String(stop.id);
+    btn.dataset.startFrame = String(stop.startFrame);
+    btn.style.setProperty('--chapter-color', stop.regionColorToken);
+    btn.setAttribute('aria-label', `Jump to ${stop.name} (${stop.region})`);
+    btn.title = stop.name;
 
-  chapterButtons = Array.from(chapterScrubberEl.querySelectorAll('.chapter-marker'));
-  chapterButtons.forEach((btn) => {
+    const dot = document.createElement('span');
+    dot.className = 'chapter-marker-dot';
+    dot.setAttribute('aria-hidden', 'true');
+
+    const label = document.createElement('span');
+    label.className = 'chapter-marker-label';
+    label.textContent = shortName;
+
+    btn.append(dot, label);
     btn.addEventListener('click', () => {
-      const startFrame = parseInt(btn.dataset.startFrame, 10);
-      if (!Number.isNaN(startFrame) && typeof onSelectStop === 'function') {
-        onSelectStop(startFrame);
+      if (typeof onSelectStop === 'function') {
+        onSelectStop(stop.startFrame);
       }
     });
+
+    fragment.appendChild(btn);
+    return btn;
   });
+
+  chapterScrubberEl.replaceChildren(fragment);
 }
 
 //------------------------------------------------------------------------------------//
@@ -105,7 +110,9 @@ export function updateOverlays(currentFrame, progress, force = false) {
       if (matchingStop) {
         captionNameEl.textContent = matchingStop.name;
         if (captionRegionEl) {
-          captionRegionEl.innerHTML = `${getIconMarkup('location', 'icon-sm')}<span>${matchingStop.region}</span>`;
+          const regionLabel = document.createElement('span');
+          regionLabel.textContent = matchingStop.region;
+          captionRegionEl.replaceChildren(createIconElement('location', 'icon-sm'), regionLabel);
         }
         captionBarEl.style.setProperty('--active-region-color', matchingStop.regionColorToken);
         captionBarEl.classList.add('is-visible');
