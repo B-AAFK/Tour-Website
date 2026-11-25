@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.github
+.vite
+.agents
+context
+scripts
+tests
+*.md
+*.log
+.env*
+.DS_Store
+Thumbs.db
